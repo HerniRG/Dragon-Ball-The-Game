@@ -9,7 +9,6 @@
     android:padding="24dp"
     tools:context=".LoginActivity">
 
-    <!-- Contenedor horizontal para la imagen y el título -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -17,7 +16,6 @@
         android:gravity="center"
         android:layout_marginBottom="16dp">
 
-        <!-- Imagen -->
         <ImageView
             android:layout_width="80dp"
             android:layout_height="80dp"
@@ -26,7 +24,6 @@
             android:src="@mipmap/ball"
             android:layout_marginEnd="12dp"/>
 
-        <!-- Título -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -36,7 +33,6 @@
             android:gravity="center"/>
     </LinearLayout>
 
-    <!-- Contenedor de los campos de entrada y el botón -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -44,7 +40,6 @@
         android:gravity="center"
         android:layout_marginTop="20dp">
 
-        <!-- Contenedor de Email y Password (Vertical) -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -52,7 +47,6 @@
             android:orientation="vertical"
             android:layout_marginEnd="16dp">
 
-            <!-- Campo Email -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -66,7 +60,6 @@
                     android:inputType="textEmailAddress"/>
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Campo Contraseña -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -81,7 +74,6 @@
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <!-- Botón Login con peso para ocupar el resto del espacio -->
         <com.google.android.material.button.MaterialButton
             android:layout_width="0dp"
             android:layout_height="wrap_content"
