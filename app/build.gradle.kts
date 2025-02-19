@@ -45,4 +45,6 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    // esta librería es para el viewmodel
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
 }
