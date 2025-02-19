@@ -9,7 +9,9 @@
     android:padding="24dp"
     tools:context=".LoginActivity">
 
+    <!-- Contenedor del Logo y Título -->
     <LinearLayout
+        android:id="@+id/loginHeaderContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -17,6 +19,7 @@
         android:layout_marginBottom="16dp">
 
         <ImageView
+            android:id="@+id/imageLogo"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_gravity="center"
@@ -25,6 +28,7 @@
             android:layout_marginEnd="12dp"/>
 
         <TextView
+            android:id="@+id/textAppName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/dragon_ball_app"
@@ -33,7 +37,9 @@
             android:gravity="center"/>
     </LinearLayout>
 
+    <!-- Contenedor del formulario de login -->
     <LinearLayout
+        android:id="@+id/loginFormContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -41,6 +47,7 @@
         android:layout_marginTop="20dp">
 
         <LinearLayout
+            android:id="@+id/inputFieldsContainer"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
@@ -48,12 +55,14 @@
             android:layout_marginEnd="16dp">
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/inputLayoutEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:endIconMode="clear_text"
                 android:layout_marginBottom="12dp">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/email"
@@ -61,12 +70,14 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/inputLayoutPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:endIconMode="password_toggle"
                 android:layout_marginBottom="12dp">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/password"
@@ -76,6 +87,7 @@
         </LinearLayout>
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonLogin"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
