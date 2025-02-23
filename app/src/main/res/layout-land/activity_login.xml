@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:gravity="center_horizontal"
     android:padding="24dp"
-    tools:context=".LoginActivity">
+    tools:context=".Login.LoginActivity">
 
     <!-- Contenedor del Logo y Título -->
     <LinearLayout
@@ -92,6 +92,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/login"/>
+
     </LinearLayout>
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/progressIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="invisible"/>
 
 </LinearLayout>
