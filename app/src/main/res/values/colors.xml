@@ -1,7 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="black_transparent">#80000000</color>
+    <!-- Colores principales -->
+    <color name="background">#FFFFFF</color>
+    <color name="formBackground">#FFFFFF</color>
 
+    <!-- Colores de la paleta Dragon Ball -->
+    <color name="primaryColor">#FF9800</color> <!-- Naranja Ki Goku -->
+    <color name="primaryLightColor">#FFC107</color> <!-- Amarillo Super Saiyan -->
+    <color name="primaryDarkColor">#E65100</color> <!-- Naranja oscuro -->
+
+    <!-- Botón y texto -->
+    <color name="buttonColor">#F57C00</color>
+    <color name="buttonTextColor">#FFFFFF</color>
+
+    <!-- Texto y bordes -->
+    <color name="textColor">#212121</color>
+    <color name="gray_light">#F5F5F5</color>
+    <color name="gray_medium">#BDBDBD</color>
+    <color name="gray_dark">#757575</color>
+
+    <!-- Errores y éxito -->
+    <color name="errorColor">#D32F2F</color>
+    <color name="successColor">#388E3C</color>
 </resources>

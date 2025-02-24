@@ -1,12 +1,16 @@
 package com.keepcoding.dragonball.Login
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.OvershootInterpolator
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.keepcoding.dragonball.Heroes.HeroesActivity
 import com.keepcoding.dragonball.databinding.ActivityLoginBinding
@@ -24,8 +28,35 @@ class LoginActivity : AppCompatActivity() {
         setContentView(binding.root)
         enableEdgeToEdge()
 
+        setupAnimations()
         setupListeners()
         setObservers()
+    }
+
+    private fun setupAnimations() {
+        // Animación para la imagen del header (fade in)
+        binding.imageHeader?.apply {
+            alpha = 0f
+            animate()
+                .alpha(1f)
+                .setDuration(800)
+                .setInterpolator(AccelerateDecelerateInterpolator())
+                .start()
+        }
+
+        // Animación para la entrada del formulario con efecto de rebote
+        val alphaAnim = ObjectAnimator.ofFloat(binding.loginFormContainer, "alpha", 0f, 1f)
+        val translateAnim = ObjectAnimator.ofFloat(binding.loginFormContainer, "translationY", 50f, 0f)
+        val scaleXAnim = ObjectAnimator.ofFloat(binding.loginFormContainer, "scaleX", 0.9f, 1f)
+        val scaleYAnim = ObjectAnimator.ofFloat(binding.loginFormContainer, "scaleY", 0.9f, 1f)
+
+        AnimatorSet().apply {
+            playTogether(alphaAnim, translateAnim, scaleXAnim, scaleYAnim)
+            duration = 1000
+            interpolator = OvershootInterpolator()
+            startDelay = 300
+            start()
+        }
     }
 
     private fun setupListeners() {
@@ -33,6 +64,20 @@ class LoginActivity : AppCompatActivity() {
             val email = binding.editTextEmail.text.toString()
             val password = binding.editTextPassword.text.toString()
             viewModel.login(email, password)
+
+            // Efecto de pulsación en el botón
+            binding.buttonLogin.animate()
+                .scaleX(0.95f)
+                .scaleY(0.95f)
+                .setDuration(150)
+                .withEndAction {
+                    binding.buttonLogin.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .start()
+                }
+                .start()
         }
     }
 
@@ -56,13 +101,40 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun showLoading() {
-        binding.progressIndicator.visibility = View.VISIBLE
-        binding.loginFormContainer.visibility = View.INVISIBLE
+        binding.progressIndicator.apply {
+            isVisible = true
+            isIndeterminate = true
+            scaleX = 0f
+            scaleY = 0f
+            alpha = 0f
+            animate()
+                .scaleX(1f)
+                .scaleY(1f)
+                .alpha(1f)
+                .setDuration(400)
+                .start()
+        }
+        binding.loginFormContainer.animate()
+            .alpha(0.5f)
+            .setDuration(300)
+            .start()
     }
 
     private fun hideLoading() {
-        binding.progressIndicator.visibility = View.GONE
-        binding.loginFormContainer.visibility = View.VISIBLE
+        binding.progressIndicator.apply {
+            isIndeterminate = false
+            animate()
+                .scaleX(0f)
+                .scaleY(0f)
+                .alpha(0f)
+                .setDuration(300)
+                .withEndAction { isVisible = false }
+                .start()
+        }
+        binding.loginFormContainer.animate()
+            .alpha(1f)
+            .setDuration(300)
+            .start()
     }
 
     private fun showToast(message: String) {
@@ -71,8 +143,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun navigateToHeroes() {
         showToast("Login exitoso")
-        val intent = Intent(this, HeroesActivity::class.java)
-        startActivity(intent)
+        startActivity(Intent(this, HeroesActivity::class.java))
         finish()
     }
 }

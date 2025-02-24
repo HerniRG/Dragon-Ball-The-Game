@@ -15,4 +15,7 @@
     <string name="login">Login</string>
     <string name="recordar_usuario">Recordar Usuario</string>
     <string name="hero_image">hero name</string>
+    <string name="header_image">encabezado login</string>
+    <string name="header_imagen">header imagen</string>
+    <string name="app_image">app image</string>
 </resources>

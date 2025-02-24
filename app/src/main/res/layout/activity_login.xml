@@ -1,98 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.textfield.TextInputLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:padding="24dp"
-    android:background="@mipmap/background"
+    android:background="@color/background"
     tools:context=".Login.LoginActivity">
 
+    <!-- Header con imagen de Dragon Ball -->
+    <ImageView
+        android:id="@+id/imageHeader"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:contentDescription="@string/header_imagen"
+        android:scaleType="centerCrop"
+        android:src="@mipmap/header"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Contenedor del formulario con mejor espaciado -->
     <LinearLayout
-        android:id="@+id/loginContainer"
+        android:id="@+id/loginFormContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center"
-        android:layout_margin="16dp">
+        android:paddingVertical="32dp"
+        android:paddingHorizontal="24dp"
+        android:background="@color/formBackground"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/imageHeader"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <ImageView
-            android:id="@+id/imageLogo"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:layout_gravity="center"
-            android:contentDescription="@string/ball_dragon"
-            android:layout_margin="20dp"
-            android:src="@mipmap/ball"/>
+            android:id="@+id/imageAppName"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:contentDescription="@string/app_image"
+            android:scaleType="fitCenter"
+            android:src="@mipmap/dragon_ball"
+            android:layout_marginBottom="16dp"/>
 
-        <com.google.android.material.progressindicator.CircularProgressIndicator
-            android:id="@+id/progressIndicator"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="invisible"/>
-
-        <LinearLayout
-            android:id="@+id/loginFormContainer"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_margin="20dp"
-            android:background="@color/black_transparent">
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_marginBottom="16dp">
 
-            <TextView
-                android:id="@+id/textAppName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/dragon_ball_app"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:paddingBottom="16dp"/>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/inputLayoutEmail"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:endIconMode="clear_text">
+                android:hint="@string/email"
+                android:inputType="textEmailAddress" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/editTextEmail"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/email"
-                    android:inputType="textEmailAddress"/>
-            </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_marginBottom="24dp">
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/inputLayoutPassword"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:endIconMode="password_toggle"
-                android:layout_marginTop="12dp">
+                android:hint="@string/password"
+                android:inputType="textPassword" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/editTextPassword"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/password"
-                    android:inputType="textPassword"/>
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <CheckBox
-                android:id="@+id/checkBoxRememberMe"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="@string/recordar_usuario"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/buttonLogin"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/login"
-                android:layout_marginTop="16dp"/>
-        </LinearLayout>
-
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonLogin"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="@string/login"
+            style="@style/Widget.Material3.Button"
+            android:textColor="@color/buttonTextColor"
+            app:backgroundTint="@color/buttonColor"
+            android:elevation="4dp"/>
     </LinearLayout>
 
-</com.google.android.material.textfield.TextInputLayout>
+    <!-- Indicador de carga -->
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/progressIndicator"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        app:indicatorSize="60dp"
+        app:trackThickness="4dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

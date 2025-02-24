@@ -55,4 +55,8 @@ dependencies {
 
     // Esta librería es para Glide
     implementation(libs.glide)
+
+    // Esta librería es para material design
+    implementation(libs.material)
+
 }
