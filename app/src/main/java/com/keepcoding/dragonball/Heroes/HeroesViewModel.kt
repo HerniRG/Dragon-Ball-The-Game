@@ -22,10 +22,16 @@ class HeroesViewModel: ViewModel() {
     private val _uiState = MutableStateFlow<State>(State.Loading)
     val uiState: StateFlow<State> = _uiState.asStateFlow()
 
+    private var token: String? = null
+
     sealed class State {
         data object Loading : State()
         data class Success(val heroes: List<Character>) : State()
         data class Error(val message: String, val errorCode: Int) : State()
+    }
+
+    fun setToken(token: String) {
+        this.token = token
     }
 
     fun downloadCharacters() {

@@ -1,5 +1,7 @@
 package com.keepcoding.dragonball.Heroes
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -12,6 +14,15 @@ import kotlinx.coroutines.launch
 
 class HeroesActivity : AppCompatActivity() {
 
+    companion object {
+        private val TAG_TOKEN = "token"
+        fun startHeroesActivity(context: Context, token: String) {
+            val intent = Intent(context, HeroesActivity::class.java)
+            intent.putExtra(TAG_TOKEN, token)
+            context.startActivity(intent)
+        }
+    }
+
     private lateinit var binding: ActivityHeroesBinding
     private val viewModel: HeroesViewModel by viewModels()
     private lateinit var adapter: HeroesAdapter
@@ -20,6 +31,14 @@ class HeroesActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityHeroesBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        val token = intent.getStringExtra("token")
+        token?.let {
+            viewModel.setToken(token)
+        } ?: run {
+            Toast.makeText(this, "Token no válido", Toast.LENGTH_SHORT).show()
+            finish()
+        }
+
         initViews()
         setObservers()
         viewModel.downloadCharacters()

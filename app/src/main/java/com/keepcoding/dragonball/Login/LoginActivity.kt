@@ -89,7 +89,7 @@ class LoginActivity : AppCompatActivity() {
                     is LoginViewModel.State.Loading -> showLoading()
                     is LoginViewModel.State.Success -> {
                         hideLoading()
-                        navigateToHeroes()
+                        navigateToHeroes(state.token)
                     }
                     is LoginViewModel.State.Error -> {
                         hideLoading()
@@ -141,9 +141,8 @@ class LoginActivity : AppCompatActivity() {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
-    private fun navigateToHeroes() {
+    private fun navigateToHeroes(token: String) {
+        HeroesActivity.startHeroesActivity(this, token)
         showToast("Login exitoso")
-        startActivity(Intent(this, HeroesActivity::class.java))
-        finish()
     }
 }
