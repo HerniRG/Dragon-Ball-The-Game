@@ -1,8 +1,31 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.Dragonball" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+        <!-- Color primario (Toolbar, botones principales...) -->
+        <item name="colorPrimary">@color/blueTheme</item>
+
+        <!-- Color del texto encima del colorPrimario -->
+        <item name="colorOnPrimary">@android:color/white</item>
+
+        <!-- Secundario (si usas chips, FAB, etc.) -->
+        <item name="colorSecondary">@color/primaryColor</item>
+        <item name="colorOnSecondary">@android:color/white</item>
+
+        <!-- Tertiary, usado en ciertos componentes Material3 -->
+        <item name="colorTertiary">@color/primaryLightColor</item>
+        <item name="colorOnTertiary">@android:color/black</item>
+
+        <!-- Superficies y fondos -->
+        <item name="colorSurface">@color/background</item>
+        <item name="colorOnSurface">@color/textColor</item>
+        <item name="colorOnBackground">@color/textColor</item>
+
+        <!-- Errores -->
+        <item name="colorError">@color/errorColor</item>
+        <item name="colorOnError">@android:color/white</item>
+
+        <item name="android:statusBarColor">?attr/colorPrimaryDark</item>
     </style>
 
     <style name="Theme.Dragonball" parent="Base.Theme.Dragonball" />

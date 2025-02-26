@@ -3,6 +3,7 @@
     <!-- Colores principales -->
     <color name="background">#FFFFFF</color>
     <color name="formBackground">#FFFFFF</color>
+    <color name="blueTheme">#2196F3</color>
 
     <!-- Colores de la paleta Dragon Ball -->
     <color name="primaryColor">#FF9800</color> <!-- Naranja Ki Goku -->

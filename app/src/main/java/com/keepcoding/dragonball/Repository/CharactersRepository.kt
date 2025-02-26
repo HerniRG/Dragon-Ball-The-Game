@@ -1,7 +1,6 @@
 package com.keepcoding.dragonball.Repository
 
 import android.content.SharedPreferences
-import android.util.Log
 import com.google.gson.Gson
 import com.keepcoding.dragonball.Model.Characters
 import com.keepcoding.dragonball.Model.CharactersDTO
@@ -19,6 +18,7 @@ class CharactersRepository {
         data class Error(val message: String) : CharactersResponse()
     }
 
+    //Si ya tenemos la lista en memoria, la devolvemos directamente. Si no, la descargamos de Internet.
     fun fetchCharacters(token: String, sharedPreferences: SharedPreferences? = null): CharactersResponse {
         // Si ya tenemos la lista en memoria, la devolvemos directamente.
         if (charactersList.isNotEmpty()) {
@@ -31,12 +31,14 @@ class CharactersRepository {
             val charactersArray: Array<Characters>? =
                 Gson().fromJson(charactersListJson, Array<Characters>::class.java)
 
+            // Si la tenemos guardada, la usamos
             if (!charactersArray.isNullOrEmpty()) {
                 charactersList = charactersArray.toList()
                 return CharactersResponse.Success(charactersList)
             }
         }
 
+        // Si no la tenemos en SharedPreferences, la descargamos de Internet
         val client = OkHttpClient()
         val url = "${BASE_URL}heros/all"
 
@@ -50,50 +52,38 @@ class CharactersRepository {
             .addHeader("Authorization", "Bearer $token")
             .build()
 
-        return try {
-            val call = client.newCall(request)
-            val response = call.execute()
+        val call = client.newCall(request)
+        val response = call.execute()
 
-            // Log de código y mensaje de la respuesta
-            Log.d("CharactersRepository", "fetchCharacters -> HTTP ${response.code} - ${response.message}")
+        return if (response.isSuccessful) {
+            val charactersDto: Array<CharactersDTO> =
+                Gson().fromJson(response.body?.string(), Array<CharactersDTO>::class.java)
 
-            if (response.isSuccessful) {
-                // Obtenemos el body como string (para poder loguearlo si quieres)
-                val responseBody = response.body?.string().orEmpty()
-                Log.d("CharactersRepository", "fetchCharacters -> body: $responseBody")
-
-                val charactersDto: Array<CharactersDTO> =
-                    Gson().fromJson(responseBody, Array<CharactersDTO>::class.java)
-
-                // Convertimos DTO a nuestra clase Characters
-                charactersList = charactersDto.map {
-                    Characters(
-                        id = it.id,
-                        name = it.name,
-                        imageUrl = it.photo,
-                        currentLife = 100,
-                        totalLife = 100,
-                        timesSelected = 0
-                    )
-                }
-
-                // Guardamos la lista en SharedPreferences
-                sharedPreferences?.edit()?.apply {
-                    putString("charactersList", Gson().toJson(charactersList))
-                    apply()
-                }
-
-                CharactersResponse.Success(charactersList)
-            } else {
-                CharactersResponse.Error("Error al descargar los personajes: ${response.message}")
+            // Convertimos DTO a nuestra clase Characters
+            charactersList = charactersDto.map {
+                Characters(
+                    id = it.id,
+                    name = it.name,
+                    imageUrl = it.photo,
+                    currentLife = 100,
+                    totalLife = 100,
+                    timesSelected = 0
+                )
             }
-        } catch (e: Exception) {
-            // Log de la excepción
-            Log.e("CharactersRepository", "fetchCharacters -> EXCEPCIÓN: ${e.message}", e)
-            CharactersResponse.Error("Excepción al descargar personajes: ${e.message}")
+
+            // Guardamos la lista en SharedPreferences
+            sharedPreferences?.edit()?.apply {
+                putString("charactersList", Gson().toJson(charactersList))
+                apply()
+            }
+
+            CharactersResponse.Success(charactersList)
+        } else {
+            CharactersResponse.Error("Error al descargar los personajes: ${response.message}")
         }
     }
 
+    // Actualiza la vida de un personaje y lo guarda en SharedPreferences
     fun updateCharacterLife(
         characterId: String,
         damage: Int,
@@ -103,6 +93,7 @@ class CharactersRepository {
             return CharactersResponse.Error("No hay personajes cargados.")
         }
 
+        // Buscamos el personaje en memoria
         val updatedList = charactersList.map { character ->
             if (character.id == characterId) {
                 val newLife = (character.currentLife - damage).coerceAtLeast(0)
@@ -112,8 +103,10 @@ class CharactersRepository {
             }
         }
 
+        // Actualizamos la lista en memoria
         charactersList = updatedList
 
+        // Lo guardamos en SharedPreferences
         sharedPreferences?.edit()?.apply {
             putString("charactersList", Gson().toJson(charactersList))
             apply()
@@ -122,6 +115,7 @@ class CharactersRepository {
         return CharactersResponse.Success(charactersList)
     }
 
+    // Incrementa en 1 el contador de veces que se ha seleccionado un personaje
     fun incrementTimesSelected(
         characterId: String,
         sharedPreferences: SharedPreferences?
