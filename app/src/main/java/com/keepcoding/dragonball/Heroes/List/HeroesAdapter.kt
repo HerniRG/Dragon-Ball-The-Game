@@ -1,45 +1,53 @@
-package com.keepcoding.dragonball.Heroes
+/*
+ * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+ * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
+ * Etiam sed turpis ac ipsum condimentum fringilla. Maecenas magna.
+ * Proin dapibus sapien vel ante. Aliquam erat volutpat. Pellentesque sagittis ligula eget metus.
+ * Vestibulum commodo. Ut rhoncus gravida arcu.
+ */
+
+package com.keepcoding.dragonball.Heroes.List
 
 import android.R
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.keepcoding.dragonball.Model.Character
+import com.keepcoding.dragonball.Model.Characters
 import com.keepcoding.dragonball.databinding.HeroRowBinding
 
 class HeroesAdapter(
-    private val onCharacterClicked: (Character) -> Unit
+    private val onCharacterClicked: (Characters) -> Unit
 ) : RecyclerView.Adapter<HeroesAdapter.CharacterViewHolder>() {
 
-    private var heroes = listOf<Character>()
+    private var heroes = listOf<Characters>()
 
-    fun updateHeroes(newHeroes: List<Character>) {
+    fun updateHeroes(newHeroes: List<Characters>) {
         this.heroes = newHeroes
         notifyDataSetChanged()
     }
 
     class CharacterViewHolder(
-        private val onCharacterClicked: (Character) -> Unit,
+        private val onCharacterClicked: (Characters) -> Unit,
         private val binding: HeroRowBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(character: Character) {
-            binding.nameHero.text = character.name
-            binding.lifeInfo.text = "Life: ${character.currentLife}/${character.totalLife}"
+        fun bind(characters: Characters) {
+            binding.nameHero.text = characters.name
+            binding.lifeInfo.text = "Life: ${characters.currentLife}/${characters.totalLife}"
 
-            binding.lifeBar.max = character.totalLife
-            binding.lifeBar.progress = character.currentLife
+            binding.lifeBar.max = characters.totalLife
+            binding.lifeBar.progress = characters.currentLife
 
             Glide.with(binding.root)
-                .load(character.imageUrl)
+                .load(characters.imageUrl)
                 .placeholder(R.drawable.ic_menu_gallery)
                 .error(R.drawable.ic_menu_gallery)
                 .centerInside()
                 .into(binding.imageHero)
 
             binding.root.setOnClickListener {
-                onCharacterClicked(character)
+                onCharacterClicked(characters)
             }
         }
     }

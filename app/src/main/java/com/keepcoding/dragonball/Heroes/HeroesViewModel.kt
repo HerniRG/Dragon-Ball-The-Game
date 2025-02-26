@@ -1,48 +1,62 @@
-/*
- * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
- * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
- * Etiam sed turpis ac ipsum condimentum fringilla. Maecenas magna.
- * Proin dapibus sapien vel ante. Aliquam erat volutpat. Pellentesque sagittis ligula eget metus.
- * Vestibulum commodo. Ut rhoncus gravida arcu.
- */
-
 package com.keepcoding.dragonball.Heroes
 
+import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.keepcoding.dragonball.Repository.DragonBallRepository
-import com.keepcoding.dragonball.Model.Character
+import com.keepcoding.dragonball.Model.Characters
+import com.keepcoding.dragonball.Repository.CharactersRepository
+import com.keepcoding.dragonball.Repository.UserRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class HeroesViewModel: ViewModel() {
+class HeroesViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow<State>(State.Loading)
     val uiState: StateFlow<State> = _uiState.asStateFlow()
 
-    private var token: String? = null
+    private val charactersRepository = CharactersRepository()
+    private val userRepository = UserRepository()
 
     sealed class State {
-        data object Loading : State()
-        data class Success(val heroes: List<Character>) : State()
+        object Loading : State()
+        data class Success(val heroes: List<Characters>) : State()
         data class Error(val message: String, val errorCode: Int) : State()
+        data class CharacterSelected(val characters: Characters) : State()
     }
 
-    fun setToken(token: String) {
-        this.token = token
+    fun selectedCharacter(characters: Characters) {
+        _uiState.value = State.CharacterSelected(characters)
     }
 
-    fun downloadCharacters() {
-        viewModelScope.launch {
+    /**
+     * Descargar personajes usando el token (desde UserRepository) y
+     * además cachear la lista en SharedPreferences (pasada desde HeroesActivity).
+     */
+    fun downloadCharacters(preferences: SharedPreferences) {
+        viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = State.Loading
-            val response = DragonBallRepository.getCharacters()
-            if (response.isSuccessful) {
-                _uiState.value = State.Success(response.body)
+
+            // Recuperamos el token del companion object
+            val token = userRepository.getToken()
+            if (token.isBlank()) {
+                _uiState.value = State.Error("El token está vacío", 401)
+                return@launch
             }
-            else {
-                _uiState.value = State.Error(response.message, response.code)
+
+            val response = charactersRepository.fetchCharacters(
+                token = token,
+                sharedPreferences = preferences  // <-- Lo pasamos para caché
+            )
+
+            when (response) {
+                is CharactersRepository.CharactersResponse.Success ->
+                    _uiState.value = State.Success(response.characters)
+
+                is CharactersRepository.CharactersResponse.Error ->
+                    _uiState.value = State.Error(response.message, 500)
             }
         }
     }

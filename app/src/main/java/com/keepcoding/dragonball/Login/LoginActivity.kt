@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.keepcoding.dragonball.Heroes.HeroesActivity
+import com.keepcoding.dragonball.LoginViewModel
 import com.keepcoding.dragonball.databinding.ActivityLoginBinding
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -31,6 +32,15 @@ class LoginActivity : AppCompatActivity() {
         setupAnimations()
         setupListeners()
         setObservers()
+
+        // 1) Verificar si ya hay un token almacenado (usuario logueado) para saltarse el login
+        viewModel.checkIfLoggedIn(getSharedPreferences("loginPrefs", MODE_PRIVATE))
+
+        // 2) (Opcional) Recuperar credenciales guardadas y rellenar los campos de texto
+        viewModel.getStoredCredentials(getSharedPreferences("loginPrefs", MODE_PRIVATE))?.let { (usuario, password) ->
+            binding.editTextEmail.setText(usuario)
+            binding.editTextPassword.setText(password)
+        }
     }
 
     private fun setupAnimations() {
@@ -63,7 +73,18 @@ class LoginActivity : AppCompatActivity() {
         binding.buttonLogin.setOnClickListener {
             val email = binding.editTextEmail.text.toString()
             val password = binding.editTextPassword.text.toString()
-            viewModel.login(email, password)
+
+            if (email.isBlank() || password.isBlank()) {
+                showToast("Por favor, introduce usuario y contraseña")
+                return@setOnClickListener
+            }
+
+            // 3) Iniciar el login con el método del ViewModel
+            viewModel.login(
+                user = email,
+                password = password,
+                preferences = getSharedPreferences("loginPrefs", MODE_PRIVATE)
+            )
 
             // Efecto de pulsación en el botón
             binding.buttonLogin.animate()
@@ -78,6 +99,16 @@ class LoginActivity : AppCompatActivity() {
                         .start()
                 }
                 .start()
+
+            // 4) (Opcional) Guardar usuario y contraseña
+            //    Supongamos que tienes un "checkBoxRememberMe" en el layout:
+            //    if (binding.checkBoxRememberMe.isChecked) {
+            //        viewModel.saveUserAndPass(
+            //            getSharedPreferences("loginPrefs", MODE_PRIVATE),
+            //            email,
+            //            password
+            //        )
+            //    }
         }
     }
 
@@ -85,16 +116,25 @@ class LoginActivity : AppCompatActivity() {
         lifecycleScope.launch {
             viewModel.uiState.collectLatest { state ->
                 when (state) {
-                    is LoginViewModel.State.Idle -> hideLoading()
-                    is LoginViewModel.State.Loading -> showLoading()
-                    is LoginViewModel.State.Success -> {
+                    is LoginViewModel.State.Idle -> {
+                        // Lógica para Idle
                         hideLoading()
-                        navigateToHeroes(state.token)
+                    }
+                    is LoginViewModel.State.Loading -> {
+                        // Lógica para Loading
+                        showLoading()
+                    }
+                    is LoginViewModel.State.Success -> {
+                        // Lógica para Success
+                        hideLoading()
+                        navigateToHeroes()
                     }
                     is LoginViewModel.State.Error -> {
+                        // Lógica para Error
                         hideLoading()
                         showToast("Error: ${state.message} (Código: ${state.errorCode})")
                     }
+                    else -> Unit
                 }
             }
         }
@@ -141,8 +181,10 @@ class LoginActivity : AppCompatActivity() {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
-    private fun navigateToHeroes(token: String) {
-        HeroesActivity.startHeroesActivity(this, token)
+    private fun navigateToHeroes() {
+        // No pasamos el token
+        val intent = Intent(this, HeroesActivity::class.java)
+        startActivity(intent)
         showToast("Login exitoso")
     }
 }

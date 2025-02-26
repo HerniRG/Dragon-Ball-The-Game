@@ -18,4 +18,6 @@
     <string name="header_image">encabezado login</string>
     <string name="header_imagen">header imagen</string>
     <string name="app_image">app image</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -59,4 +59,13 @@ dependencies {
     // Esta librería es para material design
     implementation(libs.material)
 
+    // Esta librería es para el activityFragment
+    implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.fragment.ktx)
+
+    // Esta librería es para el http
+    implementation(libs.okhttp)
+
+    // Esta librería es para los JSON
+    implementation(libs.gson)
 }
