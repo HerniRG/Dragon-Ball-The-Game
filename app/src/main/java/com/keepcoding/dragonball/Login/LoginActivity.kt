@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.OvershootInterpolator
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -27,24 +26,68 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        enableEdgeToEdge()
 
         setupAnimations()
         setupListeners()
         setObservers()
 
-        // 1) Verificar si ya hay un token almacenado (usuario logueado) para saltarse el login
-        viewModel.checkIfLoggedIn(getSharedPreferences("loginPrefs", MODE_PRIVATE))
+        // Cargar preferencias
+        val prefs = getSharedPreferences("loginPrefs", MODE_PRIVATE)
 
-        // 2) (Opcional) Recuperar credenciales guardadas y rellenar los campos de texto
-        viewModel.getStoredCredentials(getSharedPreferences("loginPrefs", MODE_PRIVATE))?.let { (usuario, password) ->
-            binding.editTextEmail.setText(usuario)
-            binding.editTextPassword.setText(password)
+        // Verificar si ya hay un usuario logueado
+        viewModel.checkIfLoggedIn(prefs)
+
+        // Recuperar credenciales guardadas y marcar el CheckBox si estaban guardadas
+        val storedCredentials = viewModel.getStoredCredentials(prefs)
+        if (storedCredentials != null) {
+            binding.editTextEmail.setText(storedCredentials.first)
+            binding.editTextPassword.setText(storedCredentials.second)
+            binding.checkBoxRememberMe.isChecked = true
+        }
+    }
+
+    private fun setupListeners() {
+        binding.buttonLogin.setOnClickListener {
+            val email = binding.editTextEmail.text.toString()
+            val password = binding.editTextPassword.text.toString()
+            if (email.isBlank() || password.isBlank()) {
+                showToast("Por favor, introduce usuario y contraseña")
+                return@setOnClickListener
+            }
+
+            val prefs = getSharedPreferences("loginPrefs", MODE_PRIVATE)
+            viewModel.login(email, password, prefs)
+
+            // Guardar credenciales si el usuario marcó "Recordar usuario"
+            if (binding.checkBoxRememberMe.isChecked) {
+                viewModel.saveUserAndPass(prefs, email, password)
+            } else {
+                viewModel.clearUserAndPass(prefs)  // Borra usuario si desmarcan el check
+            }
+        }
+    }
+
+    private fun setObservers() {
+        lifecycleScope.launch {
+            viewModel.uiState.collectLatest { state ->
+                when (state) {
+                    is LoginViewModel.State.Idle -> hideLoading()
+                    is LoginViewModel.State.Loading -> showLoading()
+                    is LoginViewModel.State.Success -> {
+                        hideLoading()
+                        navigateToHeroes()
+                    }
+                    is LoginViewModel.State.Error -> {
+                        hideLoading()
+                        showToast("Error: ${state.message} (Código: ${state.errorCode})")
+                    }
+                    else -> {}
+                }
+            }
         }
     }
 
     private fun setupAnimations() {
-        // Animación para la imagen del header (fade in)
         binding.imageHeader?.apply {
             alpha = 0f
             animate()
@@ -53,8 +96,6 @@ class LoginActivity : AppCompatActivity() {
                 .setInterpolator(AccelerateDecelerateInterpolator())
                 .start()
         }
-
-        // Animación para la entrada del formulario con efecto de rebote
         val alphaAnim = ObjectAnimator.ofFloat(binding.loginFormContainer, "alpha", 0f, 1f)
         val translateAnim = ObjectAnimator.ofFloat(binding.loginFormContainer, "translationY", 50f, 0f)
         val scaleXAnim = ObjectAnimator.ofFloat(binding.loginFormContainer, "scaleX", 0.9f, 1f)
@@ -69,122 +110,22 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupListeners() {
-        binding.buttonLogin.setOnClickListener {
-            val email = binding.editTextEmail.text.toString()
-            val password = binding.editTextPassword.text.toString()
-
-            if (email.isBlank() || password.isBlank()) {
-                showToast("Por favor, introduce usuario y contraseña")
-                return@setOnClickListener
-            }
-
-            // 3) Iniciar el login con el método del ViewModel
-            viewModel.login(
-                user = email,
-                password = password,
-                preferences = getSharedPreferences("loginPrefs", MODE_PRIVATE)
-            )
-
-            // Efecto de pulsación en el botón
-            binding.buttonLogin.animate()
-                .scaleX(0.95f)
-                .scaleY(0.95f)
-                .setDuration(150)
-                .withEndAction {
-                    binding.buttonLogin.animate()
-                        .scaleX(1f)
-                        .scaleY(1f)
-                        .setDuration(150)
-                        .start()
-                }
-                .start()
-
-            // 4) (Opcional) Guardar usuario y contraseña
-            //    Supongamos que tienes un "checkBoxRememberMe" en el layout:
-            //    if (binding.checkBoxRememberMe.isChecked) {
-            //        viewModel.saveUserAndPass(
-            //            getSharedPreferences("loginPrefs", MODE_PRIVATE),
-            //            email,
-            //            password
-            //        )
-            //    }
-        }
-    }
-
-    private fun setObservers() {
-        lifecycleScope.launch {
-            viewModel.uiState.collectLatest { state ->
-                when (state) {
-                    is LoginViewModel.State.Idle -> {
-                        // Lógica para Idle
-                        hideLoading()
-                    }
-                    is LoginViewModel.State.Loading -> {
-                        // Lógica para Loading
-                        showLoading()
-                    }
-                    is LoginViewModel.State.Success -> {
-                        // Lógica para Success
-                        hideLoading()
-                        navigateToHeroes()
-                    }
-                    is LoginViewModel.State.Error -> {
-                        // Lógica para Error
-                        hideLoading()
-                        showToast("Error: ${state.message} (Código: ${state.errorCode})")
-                    }
-                    else -> Unit
-                }
-            }
-        }
-    }
-
-    private fun showLoading() {
-        binding.progressIndicator.apply {
-            isVisible = true
-            isIndeterminate = true
-            scaleX = 0f
-            scaleY = 0f
-            alpha = 0f
-            animate()
-                .scaleX(1f)
-                .scaleY(1f)
-                .alpha(1f)
-                .setDuration(400)
-                .start()
-        }
-        binding.loginFormContainer.animate()
-            .alpha(0.5f)
-            .setDuration(300)
-            .start()
-    }
-
-    private fun hideLoading() {
-        binding.progressIndicator.apply {
-            isIndeterminate = false
-            animate()
-                .scaleX(0f)
-                .scaleY(0f)
-                .alpha(0f)
-                .setDuration(300)
-                .withEndAction { isVisible = false }
-                .start()
-        }
-        binding.loginFormContainer.animate()
-            .alpha(1f)
-            .setDuration(300)
-            .start()
+    private fun navigateToHeroes() {
+        startActivity(Intent(this, HeroesActivity::class.java))
+        showToast("Login exitoso")
     }
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
-    private fun navigateToHeroes() {
-        // No pasamos el token
-        val intent = Intent(this, HeroesActivity::class.java)
-        startActivity(intent)
-        showToast("Login exitoso")
+    private fun showLoading() {
+        binding.progressIndicator.isVisible = true
+        binding.loginFormContainer.animate().alpha(0.5f).setDuration(300).start()
+    }
+
+    private fun hideLoading() {
+        binding.progressIndicator.isVisible = false
+        binding.loginFormContainer.animate().alpha(1f).setDuration(300).start()
     }
 }

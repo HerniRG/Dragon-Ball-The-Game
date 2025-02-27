@@ -1,14 +1,14 @@
 package com.keepcoding.dragonball.Repository
 
-import android.content.SharedPreferences
 import com.google.gson.Gson
+import com.keepcoding.dragonball.Heroes.Data.PreferencesMagager
 import com.keepcoding.dragonball.Model.Characters
 import com.keepcoding.dragonball.Model.CharactersDTO
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
-class CharactersRepository {
+class CharactersRepository(private val localDataSource: PreferencesMagager) {
 
     private val BASE_URL = "https://dragonball.keepcoding.education/api/"
     private var charactersList = listOf<Characters>()
@@ -18,30 +18,25 @@ class CharactersRepository {
         data class Error(val message: String) : CharactersResponse()
     }
 
-    //Si ya tenemos la lista en memoria, la devolvemos directamente. Si no, la descargamos de Internet.
-    fun fetchCharacters(token: String, sharedPreferences: SharedPreferences? = null): CharactersResponse {
-        // Si ya tenemos la lista en memoria, la devolvemos directamente.
+    fun fetchCharacters(token: String): CharactersResponse {
+        // Si ya están en memoria, devolvemos directamente
         if (charactersList.isNotEmpty()) {
             return CharactersResponse.Success(charactersList)
         }
 
-        // Comprobamos si existe en SharedPreferences
-        sharedPreferences?.let {
-            val charactersListJson = it.getString("charactersList", "")
-            val charactersArray: Array<Characters>? =
-                Gson().fromJson(charactersListJson, Array<Characters>::class.java)
-
-            // Si la tenemos guardada, la usamos
+        // Miramos si existe en local
+        val cachedJson = localDataSource.getCharactersList()
+        if (cachedJson.isNotEmpty()) {
+            val charactersArray = Gson().fromJson(cachedJson, Array<Characters>::class.java)
             if (!charactersArray.isNullOrEmpty()) {
                 charactersList = charactersArray.toList()
                 return CharactersResponse.Success(charactersList)
             }
         }
 
-        // Si no la tenemos en SharedPreferences, la descargamos de Internet
+        // Si no están en local, los descargamos de internet
         val client = OkHttpClient()
         val url = "${BASE_URL}heros/all"
-
         val formBody = FormBody.Builder()
             .add("name", "")
             .build()
@@ -52,14 +47,13 @@ class CharactersRepository {
             .addHeader("Authorization", "Bearer $token")
             .build()
 
-        val call = client.newCall(request)
-        val response = call.execute()
-
+        val response = client.newCall(request).execute()
         return if (response.isSuccessful) {
+            val responseBody = response.body?.string().orEmpty()
             val charactersDto: Array<CharactersDTO> =
-                Gson().fromJson(response.body?.string(), Array<CharactersDTO>::class.java)
+                Gson().fromJson(responseBody, Array<CharactersDTO>::class.java)
 
-            // Convertimos DTO a nuestra clase Characters
+            // Convertimos y guardamos
             charactersList = charactersDto.map {
                 Characters(
                     id = it.id,
@@ -70,12 +64,7 @@ class CharactersRepository {
                     timesSelected = 0
                 )
             }
-
-            // Guardamos la lista en SharedPreferences
-            sharedPreferences?.edit()?.apply {
-                putString("charactersList", Gson().toJson(charactersList))
-                apply()
-            }
+            localDataSource.saveCharactersList(Gson().toJson(charactersList))
 
             CharactersResponse.Success(charactersList)
         } else {
@@ -83,62 +72,35 @@ class CharactersRepository {
         }
     }
 
-    // Actualiza la vida de un personaje y lo guarda en SharedPreferences
-    fun updateCharacterLife(
-        characterId: String,
-        damage: Int,
-        sharedPreferences: SharedPreferences?
-    ): CharactersResponse {
+    fun updateCharacterLife(characterId: String, damage: Int): CharactersResponse {
         if (charactersList.isEmpty()) {
             return CharactersResponse.Error("No hay personajes cargados.")
         }
-
-        // Buscamos el personaje en memoria
         val updatedList = charactersList.map { character ->
             if (character.id == characterId) {
                 val newLife = (character.currentLife - damage).coerceAtLeast(0)
                 character.copy(currentLife = newLife)
-            } else {
-                character
-            }
+            } else character
         }
-
-        // Actualizamos la lista en memoria
         charactersList = updatedList
 
-        // Lo guardamos en SharedPreferences
-        sharedPreferences?.edit()?.apply {
-            putString("charactersList", Gson().toJson(charactersList))
-            apply()
-        }
-
+        // Guardar en local
+        localDataSource.saveCharactersList(Gson().toJson(charactersList))
         return CharactersResponse.Success(charactersList)
     }
 
-    // Incrementa en 1 el contador de veces que se ha seleccionado un personaje
-    fun incrementTimesSelected(
-        characterId: String,
-        sharedPreferences: SharedPreferences?
-    ): CharactersResponse {
+    fun incrementTimesSelected(characterId: String): CharactersResponse {
         if (charactersList.isEmpty()) {
             return CharactersResponse.Error("No hay personajes cargados.")
         }
-
         val updatedList = charactersList.map { character ->
             if (character.id == characterId) {
                 character.copy(timesSelected = character.timesSelected + 1)
-            } else {
-                character
-            }
+            } else character
         }
-
         charactersList = updatedList
 
-        sharedPreferences?.edit()?.apply {
-            putString("charactersList", Gson().toJson(charactersList))
-            apply()
-        }
-
+        localDataSource.saveCharactersList(Gson().toJson(charactersList))
         return CharactersResponse.Success(charactersList)
     }
 }

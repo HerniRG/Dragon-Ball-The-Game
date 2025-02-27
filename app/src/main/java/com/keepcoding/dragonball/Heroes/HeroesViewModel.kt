@@ -1,8 +1,8 @@
 package com.keepcoding.dragonball.Heroes
 
-import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.keepcoding.dragonball.Heroes.Data.PreferencesMagager
 import com.keepcoding.dragonball.Model.Characters
 import com.keepcoding.dragonball.Repository.CharactersRepository
 import com.keepcoding.dragonball.Repository.UserRepository
@@ -15,10 +15,7 @@ import kotlinx.coroutines.launch
 class HeroesViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow<State>(State.Loading)
-    val uiState: StateFlow<State> = _uiState.asStateFlow()
-
-    private val charactersRepository = CharactersRepository()
-    private val userRepository = UserRepository()
+    val uiState: StateFlow<State> get() = _uiState.asStateFlow()
 
     sealed class State {
         object Loading : State()
@@ -27,37 +24,54 @@ class HeroesViewModel : ViewModel() {
         data class CharacterSelected(val characters: Characters) : State()
     }
 
-    fun selectedCharacter(characters: Characters) {
-        _uiState.value = State.CharacterSelected(characters)
-    }
+    private var charactersList = listOf<Characters>()
 
-    /**
-     * Descargar personajes usando el token (desde UserRepository) y
-     * además cachear la lista en SharedPreferences (pasada desde HeroesActivity).
-     */
-    fun downloadCharacters(preferences: SharedPreferences) {
+    fun downloadCharacters(preferencesManager: PreferencesMagager) {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = State.Loading
 
-            // Recuperamos el token del companion object
+            val userRepository = UserRepository(preferencesManager)
+            val charactersRepository = CharactersRepository(preferencesManager)
+
+            userRepository.loadTokenIfNeeded()
             val token = userRepository.getToken()
             if (token.isBlank()) {
                 _uiState.value = State.Error("El token está vacío", 401)
                 return@launch
             }
 
-            val response = charactersRepository.fetchCharacters(
-                token = token,
-                sharedPreferences = preferences  // <-- Lo pasamos para caché
-            )
-
-            when (response) {
-                is CharactersRepository.CharactersResponse.Success ->
-                    _uiState.value = State.Success(response.characters)
-
-                is CharactersRepository.CharactersResponse.Error ->
+            when (val response = charactersRepository.fetchCharacters(token)) {
+                is CharactersRepository.CharactersResponse.Success -> {
+                    charactersList = response.characters
+                    _uiState.value = State.Success(charactersList)
+                }
+                is CharactersRepository.CharactersResponse.Error -> {
                     _uiState.value = State.Error(response.message, 500)
+                }
             }
         }
+    }
+
+    fun healAllHeroes() {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (charactersList.isNotEmpty()) {
+                // Se restaura la vida de todos los héroes
+                charactersList = charactersList.map {
+                    it.copy(currentLife = it.totalLife)
+                }
+                _uiState.value = State.Success(charactersList)
+            }
+        }
+    }
+
+    fun logout(preferencesManager: PreferencesMagager) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val userRepository = UserRepository(preferencesManager)
+            userRepository.clearToken()
+        }
+    }
+
+    fun selectedCharacter(characters: Characters) {
+        _uiState.value = State.CharacterSelected(characters)
     }
 }

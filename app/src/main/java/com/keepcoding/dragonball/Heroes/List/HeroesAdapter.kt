@@ -34,7 +34,7 @@ class HeroesAdapter(
 
         fun bind(characters: Characters) {
             binding.nameHero.text = characters.name
-            binding.lifeInfo.text = "Life: ${characters.currentLife}/${characters.totalLife}"
+            binding.lifeInfo.text = "Vida: ${characters.currentLife}/${characters.totalLife}"
 
             binding.lifeBar.max = characters.totalLife
             binding.lifeBar.progress = characters.currentLife
@@ -54,10 +54,7 @@ class HeroesAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CharacterViewHolder {
         val binding = HeroRowBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return CharacterViewHolder(
-            onCharacterClicked,
-            binding
-        )
+        return CharacterViewHolder(onCharacterClicked, binding)
     }
 
     override fun onBindViewHolder(holder: CharacterViewHolder, position: Int) {

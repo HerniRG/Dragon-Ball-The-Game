@@ -59,6 +59,7 @@ class ListFragment : Fragment() {
                         // Navigate to detail
                         (activity as? Navigation)?.navToDetail()
                     }
+                    else -> {}
                 }
             }
         }

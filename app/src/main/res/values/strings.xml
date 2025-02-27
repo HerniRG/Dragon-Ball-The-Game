@@ -20,4 +20,7 @@
     <string name="app_image">app image</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="logout">Logout</string>
+    <string name="recordar_usuario_y_contrase_a">Recordar Usuario y Contraseña</string>
+    <string name="cura_a_todos_los_heroes">Cura a todos los heroes</string>
 </resources>

@@ -62,6 +62,19 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabHealAll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:src="@android:drawable/ic_input_add"
+        app:tint="@android:color/white"
+        app:maxImageSize="40dp"
+        app:backgroundTint="@color/buttonColorRed"
+        android:contentDescription="@string/cura_a_todos_los_heroes"
+        app:layout_anchor="@id/fragmentContainer"
+        app:layout_anchorGravity="bottom|end"/>
+
     <!-- Indicador de carga centrado -->
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/progressIndicator"
