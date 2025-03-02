@@ -17,7 +17,6 @@ class HeroesAdapter(
     private var heroes = listOf<Characters>()
 
     fun updateHeroes(newHeroes: List<Characters>) {
-        // Para simplicidad usamos notifyDataSetChanged, aunque se puede usar DiffUtil para animaciones más finas.
         heroes = newHeroes
         notifyDataSetChanged()
     }
@@ -30,17 +29,14 @@ class HeroesAdapter(
         fun bind(character: Characters) {
             val context = binding.root.context
 
-            // Actualizamos el nombre (sin animación, pero se puede animar también si se desea)
             binding.nameHero.text = character.name
 
-            // Animar el cambio del texto de vida: fade-out, actualizar, fade-in.
             val newLifeText = context.getString(R.string.life_placeholder, character.currentLife, character.totalLife)
             binding.lifeInfo.animate().alpha(0f).setDuration(200).withEndAction {
                 binding.lifeInfo.text = newLifeText
                 binding.lifeInfo.animate().alpha(1f).setDuration(200).start()
             }.start()
 
-            // Animar la barra de progreso, desde el valor actual hasta el nuevo
             val currentProgress = binding.lifeBar.progress
             if (currentProgress != character.currentLife) {
                 ObjectAnimator.ofInt(binding.lifeBar, "progress", currentProgress, character.currentLife)

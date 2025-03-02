@@ -88,7 +88,7 @@ class CharactersRepository(private val preferencesManager: PreferencesManager) {
         charactersList = charactersList.map { character ->
             if (character.id == characterId) {
                 val newLife = (character.currentLife - damage).coerceAtLeast(0)
-                character.copy(currentLife = newLife)
+                character.copy(currentLife = newLife, isDead = (newLife == 0))
             } else character
         }
         persistCharacters()
@@ -103,6 +103,31 @@ class CharactersRepository(private val preferencesManager: PreferencesManager) {
             if (character.id == characterId) {
                 character.copy(timesSelected = character.timesSelected + 1)
             } else character
+        }
+        persistCharacters()
+        return CharactersResponse.Success(charactersList)
+    }
+
+    fun healCharacter(characterId: String, healAmount: Int): CharactersResponse {
+        if (charactersList.isEmpty()) {
+            return CharactersResponse.Error(R.string.error_no_characters)
+        }
+        charactersList = charactersList.map { character ->
+            if (character.id == characterId) {
+                val newLife = (character.currentLife + healAmount).coerceAtMost(character.totalLife)
+                character.copy(currentLife = newLife)
+            } else character
+        }
+        persistCharacters()
+        return CharactersResponse.Success(charactersList)
+    }
+
+    fun healAllCharacters(): CharactersResponse {
+        if (charactersList.isEmpty()) {
+            return CharactersResponse.Error(R.string.error_no_characters)
+        }
+        charactersList = charactersList.map { character ->
+            character.copy(currentLife = character.totalLife, isDead = false)
         }
         persistCharacters()
         return CharactersResponse.Success(charactersList)

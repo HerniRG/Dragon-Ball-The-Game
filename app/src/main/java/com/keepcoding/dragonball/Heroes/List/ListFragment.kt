@@ -54,6 +54,7 @@ class ListFragment : Fragment() {
                         adapter.updateHeroes(state.heroes)
                     }
                     is HeroesViewModel.State.CharacterSelected -> {
+                        adapter.updateHeroes(state.heroes)
                         (activity as? Navigation)?.navToDetail()
                     }
                     is HeroesViewModel.State.Error -> {

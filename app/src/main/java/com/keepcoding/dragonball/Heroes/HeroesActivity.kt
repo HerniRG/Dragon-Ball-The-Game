@@ -9,6 +9,8 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.keepcoding.dragonball.data.PreferencesManager
+import com.keepcoding.dragonball.Repository.CharactersRepository
+import com.keepcoding.dragonball.Repository.UserRepository
 import com.keepcoding.dragonball.Heroes.Details.DetailFragment
 import com.keepcoding.dragonball.Heroes.List.ListFragment
 import com.keepcoding.dragonball.Login.LoginActivity
@@ -25,8 +27,15 @@ interface Navigation {
 class HeroesActivity : AppCompatActivity(), Navigation {
 
     private lateinit var binding: ActivityHeroesBinding
-    private val viewModel: HeroesViewModel by viewModels()
     private lateinit var preferencesManager: PreferencesManager
+
+    private val viewModel: HeroesViewModel by viewModels {
+        HeroesViewModelFactory(
+            userRepository = UserRepository(preferencesManager),
+            charactersRepository = CharactersRepository(preferencesManager),
+            preferencesManager = preferencesManager
+        )
+    }
 
     private lateinit var listFragment: ListFragment
     private lateinit var detailFragment: DetailFragment
@@ -43,7 +52,7 @@ class HeroesActivity : AppCompatActivity(), Navigation {
         detailFragment = DetailFragment()
         initFragments()
 
-        viewModel.downloadCharacters(preferencesManager)
+        viewModel.downloadCharacters()
         setObservers()
     }
 
@@ -55,7 +64,7 @@ class HeroesActivity : AppCompatActivity(), Navigation {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_logout -> {
-                viewModel.logout(preferencesManager)
+                viewModel.logout()
                 goToLogin()
                 true
             }
@@ -76,11 +85,8 @@ class HeroesActivity : AppCompatActivity(), Navigation {
     private fun setObservers() {
         lifecycleScope.launch {
             viewModel.uiState.collectLatest { state ->
-                when (state) {
-                    is HeroesViewModel.State.Success -> { /* Opcional */ }
-                    is HeroesViewModel.State.CharacterSelected -> { navToDetail() }
-                    is HeroesViewModel.State.Error -> { /* Se podría notificar error si procede */ }
-                    else -> Unit
+                if (state is HeroesViewModel.State.CharacterSelected) {
+                    navToDetail()
                 }
             }
         }
