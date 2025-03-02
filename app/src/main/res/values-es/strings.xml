@@ -19,6 +19,7 @@
     <string name="logout">Cerrar sesión</string>
     <string name="times_selected_placeholder">Visto: %d veces</string>
     <string name="life_placeholder">Vida: %d/%d</string>
+    <string name="hero_transformed">¡%1$s ha alcanzado su forma Super!</string>
     <string name="error_unauthorized">Acceso no autorizado. Por favor, inicia sesión nuevamente.</string>
     <string name="error_server">Error del servidor. Inténtalo más tarde.</string>
     <string name="error_unknown">Ocurrió un error inesperado.</string>
@@ -26,4 +27,5 @@
     <string name="login_success">Inicio de sesión exitoso</string>
     <string name="error_empty_credentials">Por favor, introduce usuario y contraseña</string>
     <string name="hero_dead">%1$s ha muerto</string>
+    <string name="transform">Transformación</string>
 </resources>

@@ -57,10 +57,28 @@ class DetailFragment : Fragment() {
                 hero.timesSelected
             )
 
-            animateProgressBar(hero.currentLife)
+            animateProgressBar(hero.currentLife, hero.totalLife)
             animateLifeText(hero.currentLife, hero.totalLife)
 
             updateButtonsState(hero.isDead)
+
+            if (hero.currentLife in 1..20 && !hero.isTransformed && !hero.isDead) {
+                if (buttonTransform.visibility == View.GONE) {
+                    buttonTransform.visibility = View.VISIBLE
+                    buttonTransform.alpha = 0f
+                    buttonTransform.scaleX = 0.8f
+                    buttonTransform.scaleY = 0.8f
+
+                    buttonTransform.animate()
+                        .alpha(1f)
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(500)
+                        .start()
+                }
+            } else {
+                buttonTransform.visibility = View.GONE
+            }
 
             Glide.with(root)
                 .load(hero.imageUrl)
@@ -72,7 +90,8 @@ class DetailFragment : Fragment() {
         }
     }
 
-    private fun animateProgressBar(newProgress: Int) {
+    private fun animateProgressBar(newProgress: Int, maxProgress: Int) {
+        binding.lifeBarDetail.max = maxProgress
         val currentProgress = binding.lifeBarDetail.progress
         if (currentProgress != newProgress) {
             ObjectAnimator.ofInt(binding.lifeBarDetail, "progress", currentProgress, newProgress)
@@ -85,6 +104,69 @@ class DetailFragment : Fragment() {
             binding.lifeInfoDetail.text = getString(R.string.life_placeholder, newLife, totalLife)
             binding.lifeInfoDetail.animate().alpha(1f).setDuration(200).start()
         }.start()
+    }
+
+    private fun animateTransformEffect() {
+        binding.flashEffect.visibility = View.VISIBLE
+        binding.flashEffect.alpha = 1f
+        binding.flashEffect.animate()
+            .alpha(0f)
+            .setDuration(300)
+            .withEndAction {
+                binding.flashEffect.alpha = 1f
+                binding.flashEffect.animate()
+                    .alpha(0f)
+                    .setDuration(300)
+                    .withEndAction {
+                        binding.flashEffect.visibility = View.GONE
+                    }.start()
+            }.start()
+
+        binding.imageHeroDetail.animate()
+            .scaleX(1.2f).scaleY(1.2f)
+            .alpha(0.7f)
+            .setDuration(300)
+            .withEndAction {
+                binding.imageHeroDetail.animate()
+                    .scaleX(1.05f).scaleY(1.05f)
+                    .setDuration(100)
+                    .withEndAction {
+                        binding.imageHeroDetail.animate()
+                            .scaleX(1.15f).scaleY(1.15f)
+                            .setDuration(100)
+                            .withEndAction {
+                                binding.imageHeroDetail.animate()
+                                    .scaleX(1f).scaleY(1f)
+                                    .alpha(1f)
+                                    .setDuration(300)
+                                    .start()
+                            }.start()
+                    }.start()
+            }.start()
+
+        binding.lifeBarDetail.animate()
+            .scaleX(1.1f).scaleY(1.2f)
+            .setDuration(200)
+            .withEndAction {
+                binding.lifeBarDetail.animate()
+                    .scaleX(1f).scaleY(1f)
+                    .setDuration(200)
+                    .start()
+            }.start()
+
+        // ✨ Brillo en botones de acción
+        val buttons = listOf(binding.buttonDamage, binding.buttonHeal)
+        buttons.forEach { button ->
+            button.animate()
+                .scaleX(1.1f).scaleY(1.1f)
+                .setDuration(200)
+                .withEndAction {
+                    button.animate()
+                        .scaleX(1f).scaleY(1f)
+                        .setDuration(200)
+                        .start()
+                }.start()
+        }
     }
 
     private fun updateButtonsState(isDead: Boolean) {
@@ -130,6 +212,14 @@ class DetailFragment : Fragment() {
         binding.buttonHeal.setOnClickListener {
             (viewModel.uiState.value as? HeroesViewModel.State.CharacterSelected)?.characters?.let {
                 viewModel.healHero(it)
+            }
+        }
+
+        binding.buttonTransform.setOnClickListener {
+            (viewModel.uiState.value as? HeroesViewModel.State.CharacterSelected)?.characters?.let { hero ->
+                viewModel.transformHero(hero)
+                animateTransformEffect()
+                Toast.makeText(context, getString(R.string.hero_transformed, hero.name), Toast.LENGTH_SHORT).show()
             }
         }
     }

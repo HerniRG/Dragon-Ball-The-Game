@@ -4,6 +4,8 @@
     <color name="background">#FFFFFF</color>
     <color name="formBackground">#FFFFFF</color>
     <color name="blueTheme">#629BD0</color>
+    <color name="yellowTheme">#F57C00</color>
+    <color name="transformationBackground">#F2EDAA</color> <!-- Un amarillo suave -->
 
 
     <!-- Colores de la paleta Dragon Ball -->

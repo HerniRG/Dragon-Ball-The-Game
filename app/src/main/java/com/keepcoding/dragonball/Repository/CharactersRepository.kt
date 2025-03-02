@@ -132,4 +132,45 @@ class CharactersRepository(private val preferencesManager: PreferencesManager) {
         persistCharacters()
         return CharactersResponse.Success(charactersList)
     }
+
+    fun resetCharacterOnDeath(characterId: String): CharactersResponse {
+        if (charactersList.isEmpty()) {
+            return CharactersResponse.Error(R.string.error_no_characters)
+        }
+
+        charactersList = charactersList.map { character ->
+            if (character.id == characterId && character.isDead) {
+                character.copy(
+                    name = character.name.replace("Super ", ""),
+                    isTransformed = false,
+                    totalLife = 100,
+                    currentLife = 0,
+                    isDead = true
+                )
+            } else character
+        }
+
+        persistCharacters()
+        return CharactersResponse.Success(charactersList)
+    }
+
+    fun transformCharacter(characterId: String): CharactersResponse {
+        if (charactersList.isEmpty()) {
+            return CharactersResponse.Error(R.string.error_no_characters)
+        }
+
+        charactersList = charactersList.map { character ->
+            if (character.id == characterId && !character.isTransformed) {
+                character.copy(
+                    name = "Super ${character.name}",
+                    currentLife = (character.currentLife + 50).coerceAtMost(character.totalLife + 50),
+                    totalLife = character.totalLife + 50,
+                    isTransformed = true
+                )
+            } else character
+        }
+
+        persistCharacters()
+        return CharactersResponse.Success(charactersList)
+    }
 }

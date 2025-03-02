@@ -49,6 +49,12 @@ class HeroesAdapter(
             }
             binding.lifeBar.max = character.totalLife
 
+            if (character.isTransformed) {
+                binding.root.setCardBackgroundColor(context.getColor(R.color.transformationBackground))
+            } else {
+                binding.root.setCardBackgroundColor(context.getColor(android.R.color.white))
+            }
+
             if (character.isDead) {
                 binding.root.animate().alpha(0.5f).setDuration(300).start()
                 binding.root.isClickable = false

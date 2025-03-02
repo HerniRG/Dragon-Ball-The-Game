@@ -66,6 +66,7 @@ class HeroesViewModel(
             if (response is CharactersRepository.CharactersResponse.Success) {
                 val updatedCharacter = response.characters.find { it.id == hero.id } ?: hero.copy(currentLife = hero.currentLife - randomDamage)
                 _uiState.value = State.CharacterSelected(updatedCharacter, response.characters)
+                checkAndResetHero(updatedCharacter)
             }
         }
     }
@@ -84,6 +85,28 @@ class HeroesViewModel(
             val response = charactersRepository.incrementTimesSelected(character.id)
             if (response is CharactersRepository.CharactersResponse.Success) {
                 val updatedCharacter = response.characters.find { it.id == character.id } ?: character
+                _uiState.value = State.CharacterSelected(updatedCharacter, response.characters)
+            }
+        }
+    }
+
+    private fun checkAndResetHero(hero: Characters) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (hero.isDead) {
+                val response = charactersRepository.resetCharacterOnDeath(hero.id)
+                if (response is CharactersRepository.CharactersResponse.Success) {
+                    val updatedCharacter = response.characters.find { it.id == hero.id } ?: hero
+                    _uiState.value = State.CharacterSelected(updatedCharacter, response.characters)
+                }
+            }
+        }
+    }
+
+    fun transformHero(hero: Characters) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val response = charactersRepository.transformCharacter(hero.id)
+            if (response is CharactersRepository.CharactersResponse.Success) {
+                val updatedCharacter = response.characters.find { it.id == hero.id } ?: hero
                 _uiState.value = State.CharacterSelected(updatedCharacter, response.characters)
             }
         }

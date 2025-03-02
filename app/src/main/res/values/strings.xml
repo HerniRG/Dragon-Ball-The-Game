@@ -17,6 +17,7 @@
     <string name="logout">Logout</string>
     <string name="times_selected_placeholder">Seen: %d times</string>
     <string name="life_placeholder">Life: %d/%d</string>
+    <string name="hero_transformed">%1$s has reached their Super form!</string>
     <string name="error_unauthorized">Unauthorized access. Please log in again.</string>
     <string name="error_server">Server error. Try again later.</string>
     <string name="error_unknown">An unexpected error occurred.</string>
@@ -24,4 +25,5 @@
     <string name="login_success">Login successful</string>
     <string name="error_empty_credentials">Please enter your email and password</string>
     <string name="hero_dead">%1$s has died</string>
+    <string name="transform">Transformation</string>
 </resources>
