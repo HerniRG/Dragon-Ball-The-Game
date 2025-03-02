@@ -1,4 +1,4 @@
-package com.keepcoding.dragonball.data
+package com.keepcoding.dragonball.Repository
 
 object ApiConstants {
     const val BASE_URL = "https://dragonball.keepcoding.education/api/"

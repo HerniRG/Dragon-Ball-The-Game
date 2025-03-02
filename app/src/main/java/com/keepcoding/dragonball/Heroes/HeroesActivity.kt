@@ -33,7 +33,6 @@ class HeroesActivity : AppCompatActivity(), Navigation {
         HeroesViewModelFactory(
             userRepository = UserRepository(preferencesManager),
             charactersRepository = CharactersRepository(preferencesManager),
-            preferencesManager = preferencesManager
         )
     }
 

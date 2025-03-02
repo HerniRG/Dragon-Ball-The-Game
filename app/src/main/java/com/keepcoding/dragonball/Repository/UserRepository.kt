@@ -2,13 +2,12 @@ package com.keepcoding.dragonball.Repository
 
 import android.util.Base64
 import com.keepcoding.dragonball.R
-import com.keepcoding.dragonball.data.ApiConstants
 import com.keepcoding.dragonball.data.PreferencesManager
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
-class UserRepository(private val preferencesManager: PreferencesManager) {
+open class UserRepository(private val preferencesManager: PreferencesManager) {
 
     companion object {
         private var token: String = ""
@@ -19,7 +18,7 @@ class UserRepository(private val preferencesManager: PreferencesManager) {
         data class Error(val errorResId: Int) : LoginResponse()
     }
 
-    fun login(user: String, password: String): LoginResponse {
+    open fun login(user: String, password: String): LoginResponse {
         return try {
             val credentials = "$user:$password"
             val base64Credentials = Base64.encodeToString(credentials.toByteArray(), Base64.NO_WRAP)
@@ -47,19 +46,19 @@ class UserRepository(private val preferencesManager: PreferencesManager) {
         }
     }
 
-    fun getToken(): String {
+    open fun getToken(): String {
         if (token.isEmpty()) {
             token = preferencesManager.getToken()
         }
         return token
     }
 
-    fun clearToken() {
+    open fun clearToken() {
         token = ""
         preferencesManager.clearToken()
     }
 
-    fun loadTokenIfNeeded() {
+    open fun loadTokenIfNeeded() {
         if (token.isEmpty()) {
             token = preferencesManager.getToken()
         }

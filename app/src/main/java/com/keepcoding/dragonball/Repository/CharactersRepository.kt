@@ -2,7 +2,6 @@ package com.keepcoding.dragonball.Repository
 
 import com.google.gson.Gson
 import com.keepcoding.dragonball.R
-import com.keepcoding.dragonball.data.ApiConstants
 import com.keepcoding.dragonball.data.PreferencesManager
 import com.keepcoding.dragonball.Model.Characters
 import com.keepcoding.dragonball.Model.CharactersDTO
@@ -10,7 +9,7 @@ import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
-class CharactersRepository(private val preferencesManager: PreferencesManager) {
+open class CharactersRepository(private val preferencesManager: PreferencesManager) {
 
     private var charactersList = listOf<Characters>()
 
@@ -41,7 +40,7 @@ class CharactersRepository(private val preferencesManager: PreferencesManager) {
         preferencesManager.saveCharactersList(getUserId(), json)
     }
 
-    fun fetchCharacters(token: String): CharactersResponse {
+    open fun fetchCharacters(token: String): CharactersResponse {
         if (charactersList.isNotEmpty()) {
             return CharactersResponse.Success(charactersList)
         }

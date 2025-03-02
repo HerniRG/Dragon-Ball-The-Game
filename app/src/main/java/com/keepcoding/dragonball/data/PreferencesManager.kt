@@ -2,7 +2,7 @@ package com.keepcoding.dragonball.data
 
 import android.content.SharedPreferences
 
-class PreferencesManager(private val sharedPrefs: SharedPreferences) {
+open class PreferencesManager(private val sharedPrefs: SharedPreferences) {
 
     companion object {
         private const val KEY_TOKEN = "userToken"
@@ -25,20 +25,20 @@ class PreferencesManager(private val sharedPrefs: SharedPreferences) {
             .apply()
     }
 
-    fun saveUserAndPass(user: String, password: String) {
+    open fun saveUserAndPass(user: String, password: String) {
         sharedPrefs.edit()
             .putString(KEY_USER, user)
             .putString(KEY_PASSWORD, password)
             .apply()
     }
 
-    fun getUserAndPass(): Pair<String, String>? {
+    open fun getUserAndPass(): Pair<String, String>? {
         val user = sharedPrefs.getString(KEY_USER, "") ?: ""
         val pass = sharedPrefs.getString(KEY_PASSWORD, "") ?: ""
         return if (user.isNotEmpty() && pass.isNotEmpty()) user to pass else null
     }
 
-    fun clearUserAndPass() {
+    open fun clearUserAndPass() {
         sharedPrefs.edit()
             .remove(KEY_USER)
             .remove(KEY_PASSWORD)

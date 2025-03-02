@@ -70,4 +70,6 @@ dependencies {
     // Esta librería es para los JSON
     implementation(libs.gson)
 
+    // Esta librería es para test
+    testImplementation(libs.kotlinx.coroutines.test)
 }
