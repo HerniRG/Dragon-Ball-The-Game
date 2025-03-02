@@ -23,6 +23,7 @@
 ## Tecnologías 🛠️
 
 - **Kotlin** - Lenguaje de programación principal.
+- **XML** - Interfaz diseñada en XML.
 - **MVVM** - Arquitectura utilizada en la app.
 - **OkHttp** - Para llamadas HTTP a la API.
 - **Coroutines y Flow** - Para operaciones asíncronas.
