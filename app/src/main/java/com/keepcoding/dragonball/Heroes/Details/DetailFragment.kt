@@ -51,6 +51,12 @@ class DetailFragment : Fragment() {
         with(binding) {
             nameHero.text = hero.name
 
+            timesSelectedText.text = resources.getQuantityString(
+                R.plurals.times_selected,
+                hero.timesSelected,
+                hero.timesSelected
+            )
+
             animateProgressBar(hero.currentLife)
             animateLifeText(hero.currentLife, hero.totalLife)
 
@@ -76,7 +82,7 @@ class DetailFragment : Fragment() {
 
     private fun animateLifeText(newLife: Int, totalLife: Int) {
         binding.lifeInfoDetail.animate().alpha(0f).setDuration(200).withEndAction {
-            "Vida: $newLife/$totalLife".also { binding.lifeInfoDetail.text = it }
+            binding.lifeInfoDetail.text = getString(R.string.life_placeholder, newLife, totalLife)
             binding.lifeInfoDetail.animate().alpha(1f).setDuration(200).start()
         }.start()
     }

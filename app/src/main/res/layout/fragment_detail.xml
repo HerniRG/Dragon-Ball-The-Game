@@ -50,7 +50,7 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
@@ -66,14 +66,26 @@
 
             <TextView
                 android:id="@+id/nameHero"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="@string/hero_name"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/black"
-                tools:text="Goku"/>
+                tools:text="Goku"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/timesSelectedText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/times_selected_placeholder"
+                android:textSize="16sp"
+                android:textColor="@color/gray"
+                android:layout_marginStart="8dp"
+                tools:text="Visto 5 veces"/>
         </LinearLayout>
+
 
         <LinearLayout
             android:layout_width="match_parent"

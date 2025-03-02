@@ -15,6 +15,8 @@
     <string name="heal_all_heroes">Heal all heroes</string>
     <string name="dead">Dead</string>
     <string name="logout">Logout</string>
+    <string name="times_selected_placeholder">Seen: %d times</string>
+    <string name="life_placeholder">Life: %d/%d</string>
     <string name="error_unauthorized">Unauthorized access. Please log in again.</string>
     <string name="error_server">Server error. Try again later.</string>
     <string name="error_unknown">An unexpected error occurred.</string>

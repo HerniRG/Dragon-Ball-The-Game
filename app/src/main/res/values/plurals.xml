@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="times_selected">
+        <item quantity="one">seen %d time</item>
+        <item quantity="other">seen %d times</item>
+    </plurals>
+</resources>

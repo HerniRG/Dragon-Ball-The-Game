@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.keepcoding.dragonball.Model.Characters
+import com.keepcoding.dragonball.R
 import com.keepcoding.dragonball.databinding.HeroRowBinding
 
 class HeroesAdapter(
@@ -27,11 +28,13 @@ class HeroesAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(character: Characters) {
+            val context = binding.root.context
+
             // Actualizamos el nombre (sin animación, pero se puede animar también si se desea)
             binding.nameHero.text = character.name
 
             // Animar el cambio del texto de vida: fade-out, actualizar, fade-in.
-            val newLifeText = "Vida: ${character.currentLife}/${character.totalLife}"
+            val newLifeText = context.getString(R.string.life_placeholder, character.currentLife, character.totalLife)
             binding.lifeInfo.animate().alpha(0f).setDuration(200).withEndAction {
                 binding.lifeInfo.text = newLifeText
                 binding.lifeInfo.animate().alpha(1f).setDuration(200).start()

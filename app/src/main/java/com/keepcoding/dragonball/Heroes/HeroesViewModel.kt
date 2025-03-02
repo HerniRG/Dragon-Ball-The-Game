@@ -144,7 +144,18 @@ class HeroesViewModel : ViewModel() {
 
     fun selectedCharacter(character: Characters) {
         if (!character.isDead) {
-            _uiState.value = State.CharacterSelected(character)
+            charactersList = charactersList.map {
+                if (it.id == character.id) {
+                    it.copy(timesSelected = it.timesSelected + 1)
+                } else {
+                    it
+                }
+            }
+            persistCharacters()
+
+            val updatedCharacter = charactersList.find { it.id == character.id } ?: character
+
+            _uiState.value = State.CharacterSelected(updatedCharacter)
         }
     }
 }

@@ -17,6 +17,8 @@
     <string name="heal_all_heroes">Cura a todos los Heroes</string>
     <string name="dead">Muerto</string>
     <string name="logout">Cerrar sesión</string>
+    <string name="times_selected_placeholder">Visto: %d veces</string>
+    <string name="life_placeholder">Vida: %d/%d</string>
     <string name="error_unauthorized">Acceso no autorizado. Por favor, inicia sesión nuevamente.</string>
     <string name="error_server">Error del servidor. Inténtalo más tarde.</string>
     <string name="error_unknown">Ocurrió un error inesperado.</string>
