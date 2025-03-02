@@ -2,7 +2,7 @@
 
 ## Descripción 📖
 
-**Dragon Ball The Game** es una aplicación Android basada en el universo de Dragon Ball, donde los usuarios pueden explorar y gestionar personajes con mecánicas de vida, daño y curación. La aplicación sigue la arquitectura **MVVM** y utiliza tecnologías modernas como **Kotlin**, **Coroutines**, **ViewModel**, **LiveData**, **OkHttp**, y **Material Design 3**.
+**Dragon Ball The Game** es una aplicación Android basada en el universo de Dragon Ball, donde los usuarios pueden explorar y gestionar personajes con mecánicas de vida, daño y curación. La aplicación sigue la arquitectura **MVVM** y **Material Design 3**.
 
 ## Características 🏆
 
@@ -38,30 +38,6 @@
 2. Abre el proyecto en **Android Studio**.
 3. Asegúrate de tener configurado un dispositivo o emulador.
 4. Compila y ejecuta la aplicación.
-
-## Estructura del Proyecto 📂
-
-```
-Dragon-Ball-The-Game/
-│── app/
-│   ├── src/main/java/com/keepcoding/dragonball/
-│   │   ├── Heroes/   # Vista y lógica de los personajes
-│   │   ├── Login/    # Gestión de autenticación
-│   │   ├── Repository/ # Lógica de datos y llamadas API
-│   │   ├── Model/    # Modelos de datos
-│   │   ├── data/     # Configuración y constantes
-│   │   ├── utils/    # Utilidades y helpers
-│   ├── res/          # Recursos de la aplicación
-│── README.md
-```
-
-## Contribuciones 🤝
-
-Si quieres mejorar el proyecto, puedes:
-
-- Crear un **fork** del repositorio.
-- Hacer cambios en una nueva rama.
-- Enviar un **pull request** con tus mejoras.
 
 ## Contacto 📬
 
