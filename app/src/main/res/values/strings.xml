@@ -23,4 +23,10 @@
     <string name="logout">Logout</string>
     <string name="recordar_usuario_y_contrase_a">Recordar Usuario y Contraseña</string>
     <string name="cura_a_todos_los_heroes">Cura a todos los heroes</string>
+    <string name="icono_del_h_roe">Icono del héroe</string>
+    <string name="nombre_del_h_roe">Nombre del Héroe</string>
+    <string name="damage">Damage</string>
+    <string name="heal">Heal</string>
+    <string name="volver_al_listado">Volver al listado</string>
+    <string name="muerto">MUERTO</string>
 </resources>

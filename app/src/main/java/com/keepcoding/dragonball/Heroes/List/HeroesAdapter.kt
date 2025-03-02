@@ -1,15 +1,8 @@
-/*
- * Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
- * Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
- * Etiam sed turpis ac ipsum condimentum fringilla. Maecenas magna.
- * Proin dapibus sapien vel ante. Aliquam erat volutpat. Pellentesque sagittis ligula eget metus.
- * Vestibulum commodo. Ut rhoncus gravida arcu.
- */
-
 package com.keepcoding.dragonball.Heroes.List
 
-import android.R
+import android.animation.ObjectAnimator
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -23,7 +16,8 @@ class HeroesAdapter(
     private var heroes = listOf<Characters>()
 
     fun updateHeroes(newHeroes: List<Characters>) {
-        this.heroes = newHeroes
+        // Para simplicidad usamos notifyDataSetChanged, aunque se puede usar DiffUtil para animaciones más finas.
+        heroes = newHeroes
         notifyDataSetChanged()
     }
 
@@ -32,22 +26,51 @@ class HeroesAdapter(
         private val binding: HeroRowBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(characters: Characters) {
-            binding.nameHero.text = characters.name
-            binding.lifeInfo.text = "Vida: ${characters.currentLife}/${characters.totalLife}"
+        fun bind(character: Characters) {
+            // Actualizamos el nombre (sin animación, pero se puede animar también si se desea)
+            binding.nameHero.text = character.name
 
-            binding.lifeBar.max = characters.totalLife
-            binding.lifeBar.progress = characters.currentLife
+            // Animar el cambio del texto de vida: fade-out, actualizar, fade-in.
+            val newLifeText = "Vida: ${character.currentLife}/${character.totalLife}"
+            binding.lifeInfo.animate().alpha(0f).setDuration(200).withEndAction {
+                binding.lifeInfo.text = newLifeText
+                binding.lifeInfo.animate().alpha(1f).setDuration(200).start()
+            }.start()
+
+            // Animar la barra de progreso, desde el valor actual hasta el nuevo
+            val currentProgress = binding.lifeBar.progress
+            if (currentProgress != character.currentLife) {
+                ObjectAnimator.ofInt(binding.lifeBar, "progress", currentProgress, character.currentLife)
+                    .apply {
+                        duration = 500L
+                        start()
+                    }
+            } else {
+                binding.lifeBar.progress = character.currentLife
+            }
+            binding.lifeBar.max = character.totalLife
+
+            if (character.isDead) {
+                binding.root.animate().alpha(0.5f).setDuration(300).start()
+                binding.root.isClickable = false
+                binding.overlayDead.visibility = View.VISIBLE
+            } else {
+                binding.root.animate().alpha(1f).setDuration(300).start()
+                binding.root.isClickable = true
+                binding.overlayDead.visibility = View.GONE
+            }
 
             Glide.with(binding.root)
-                .load(characters.imageUrl)
-                .placeholder(R.drawable.ic_menu_gallery)
-                .error(R.drawable.ic_menu_gallery)
+                .load(character.imageUrl)
+                .placeholder(android.R.drawable.ic_menu_gallery)
+                .error(android.R.drawable.ic_menu_gallery)
                 .centerInside()
                 .into(binding.imageHero)
 
             binding.root.setOnClickListener {
-                onCharacterClicked(characters)
+                if (!character.isDead) {
+                    onCharacterClicked(character)
+                }
             }
         }
     }

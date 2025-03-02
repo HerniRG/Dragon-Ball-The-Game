@@ -1,11 +1,10 @@
-package com.keepcoding.dragonball.Heroes.Data
+package com.keepcoding.dragonball.data
 
 import android.content.SharedPreferences
 
-class PreferencesMagager(private val sharedPrefs: SharedPreferences) {
+class PreferencesManager(private val sharedPrefs: SharedPreferences) {
 
     companion object {
-        // Clave unificada para token
         private const val KEY_TOKEN = "userToken"
         private const val KEY_USER = "User"
         private const val KEY_PASSWORD = "Password"
@@ -18,9 +17,7 @@ class PreferencesMagager(private val sharedPrefs: SharedPreferences) {
             .apply()
     }
 
-    fun getToken(): String {
-        return sharedPrefs.getString(KEY_TOKEN, "") ?: ""
-    }
+    fun getToken(): String = sharedPrefs.getString(KEY_TOKEN, "") ?: ""
 
     fun clearToken() {
         sharedPrefs.edit()
@@ -38,9 +35,7 @@ class PreferencesMagager(private val sharedPrefs: SharedPreferences) {
     fun getUserAndPass(): Pair<String, String>? {
         val user = sharedPrefs.getString(KEY_USER, "") ?: ""
         val pass = sharedPrefs.getString(KEY_PASSWORD, "") ?: ""
-        return if (user.isNotEmpty() && pass.isNotEmpty()) {
-            user to pass
-        } else null
+        return if (user.isNotEmpty() && pass.isNotEmpty()) user to pass else null
     }
 
     fun clearUserAndPass() {
@@ -50,13 +45,13 @@ class PreferencesMagager(private val sharedPrefs: SharedPreferences) {
             .apply()
     }
 
-    fun saveCharactersList(charactersJson: String) {
+    fun saveCharactersList(userId: String, charactersJson: String) {
         sharedPrefs.edit()
-            .putString(KEY_CHARACTERS_LIST, charactersJson)
+            .putString("$KEY_CHARACTERS_LIST$userId", charactersJson)
             .apply()
     }
 
-    fun getCharactersList(): String {
-        return sharedPrefs.getString(KEY_CHARACTERS_LIST, "") ?: ""
+    fun getCharactersList(userId: String): String {
+        return sharedPrefs.getString("$KEY_CHARACTERS_LIST$userId", "") ?: ""
     }
 }

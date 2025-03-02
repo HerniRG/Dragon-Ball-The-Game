@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -8,7 +9,6 @@
     android:background="@color/background"
     tools:context=".Login.LoginActivity">
 
-    <!-- Header con imagen de Dragon Ball -->
     <ImageView
         android:id="@+id/imageHeader"
         android:layout_width="match_parent"
@@ -16,11 +16,11 @@
         android:contentDescription="@string/header_imagen"
         android:scaleType="centerCrop"
         android:src="@mipmap/header"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="ImageContrastCheck,ImageContrastCheck" />
 
-    <!-- Contenedor del formulario con mejor espaciado -->
     <LinearLayout
         android:id="@+id/loginFormContainer"
         android:layout_width="match_parent"
@@ -82,16 +82,15 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/buttonLogin"
+            style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:text="@string/login"
-            style="@style/Widget.Material3.Button"
             android:textColor="@color/buttonTextColor"
             app:backgroundTint="@color/buttonColor"
             android:elevation="4dp"/>
     </LinearLayout>
 
-    <!-- Indicador de carga -->
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/progressIndicator"
         android:layout_width="60dp"

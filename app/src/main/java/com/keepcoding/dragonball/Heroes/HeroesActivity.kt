@@ -1,14 +1,14 @@
 package com.keepcoding.dragonball.Heroes
 
+import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.keepcoding.dragonball.Heroes.Data.PreferencesMagager
+import com.keepcoding.dragonball.data.PreferencesManager
 import com.keepcoding.dragonball.Heroes.Details.DetailFragment
 import com.keepcoding.dragonball.Heroes.List.ListFragment
 import com.keepcoding.dragonball.Login.LoginActivity
@@ -26,7 +26,10 @@ class HeroesActivity : AppCompatActivity(), Navigation {
 
     private lateinit var binding: ActivityHeroesBinding
     private val viewModel: HeroesViewModel by viewModels()
-    private lateinit var preferencesManager: PreferencesMagager
+    private lateinit var preferencesManager: PreferencesManager
+
+    private lateinit var listFragment: ListFragment
+    private lateinit var detailFragment: DetailFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,13 +37,13 @@ class HeroesActivity : AppCompatActivity(), Navigation {
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
 
-        preferencesManager = PreferencesMagager(getSharedPreferences("loginPrefs", MODE_PRIVATE))
+        preferencesManager = PreferencesManager(getSharedPreferences("loginPrefs", MODE_PRIVATE))
 
-        // Descargamos personajes
-        viewModel.downloadCharacters(preferencesManager)
-
+        listFragment = ListFragment()
+        detailFragment = DetailFragment()
         initFragments()
-        setupListeners()
+
+        viewModel.downloadCharacters(preferencesManager)
         setObservers()
     }
 
@@ -61,14 +64,12 @@ class HeroesActivity : AppCompatActivity(), Navigation {
     }
 
     private fun initFragments() {
-        navToList()
-    }
-
-    private fun setupListeners() {
-        binding.fabHealAll.setOnClickListener {
-            viewModel.healAllHeroes()
-            // Se muestra el Toast cada vez que se pulsa el botón
-            Toast.makeText(this, "Todos los héroes han sido curados 🎉", Toast.LENGTH_SHORT).show()
+        supportFragmentManager.beginTransaction().apply {
+            add(binding.fragmentContainer.id, detailFragment, "DetailFragment")
+            hide(detailFragment)
+            add(binding.fragmentContainer.id, listFragment, "ListFragment")
+            show(listFragment)
+            commit()
         }
     }
 
@@ -76,11 +77,10 @@ class HeroesActivity : AppCompatActivity(), Navigation {
         lifecycleScope.launch {
             viewModel.uiState.collectLatest { state ->
                 when (state) {
-                    is HeroesViewModel.State.Success -> { }
-                    is HeroesViewModel.State.Error -> {
-                        Toast.makeText(this@HeroesActivity, "Error: ${state.message}", Toast.LENGTH_SHORT).show()
-                    }
-                    else -> {}
+                    is HeroesViewModel.State.Success -> { /* Opcional */ }
+                    is HeroesViewModel.State.CharacterSelected -> { navToDetail() }
+                    is HeroesViewModel.State.Error -> { /* Se podría notificar error si procede */ }
+                    else -> Unit
                 }
             }
         }
@@ -89,21 +89,30 @@ class HeroesActivity : AppCompatActivity(), Navigation {
     private fun goToLogin() {
         val intent = Intent(this, LoginActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
+        val options = ActivityOptions.makeCustomAnimation(this, R.anim.slide_in_left, R.anim.slide_out_right)
+        startActivity(intent, options.toBundle())
         finish()
     }
 
     override fun navToList() {
         supportFragmentManager.beginTransaction().apply {
-            replace(binding.fragmentContainer.id, ListFragment())
-            addToBackStack(null)
+            setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right)
+            hide(detailFragment)
+            show(listFragment)
             commit()
         }
     }
 
     override fun navToDetail() {
         supportFragmentManager.beginTransaction().apply {
-            replace(binding.fragmentContainer.id, DetailFragment())
+            setCustomAnimations(
+                R.anim.slide_in_right,
+                R.anim.slide_out_left,
+                R.anim.slide_in_left,
+                R.anim.slide_out_right
+            )
+            hide(listFragment)
+            show(detailFragment)
             addToBackStack(null)
             commit()
         }

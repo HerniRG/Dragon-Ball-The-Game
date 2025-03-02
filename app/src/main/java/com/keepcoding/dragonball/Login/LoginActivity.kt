@@ -11,34 +11,39 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import com.keepcoding.dragonball.Heroes.HeroesActivity
-import com.keepcoding.dragonball.LoginViewModel
+import com.keepcoding.dragonball.data.PreferencesManager
 import com.keepcoding.dragonball.databinding.ActivityLoginBinding
+import com.keepcoding.dragonball.Heroes.HeroesActivity
+import com.keepcoding.dragonball.Repository.UserRepository
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
 
-    private val viewModel: LoginViewModel by viewModels()
-    private lateinit var binding: ActivityLoginBinding
+    private val binding: ActivityLoginBinding by lazy {
+        ActivityLoginBinding.inflate(layoutInflater)
+    }
+    private val preferencesManager: PreferencesManager by lazy {
+        PreferencesManager(getSharedPreferences("loginPrefs", MODE_PRIVATE))
+    }
+    private val userRepository: UserRepository by lazy {
+        UserRepository(preferencesManager)
+    }
+    private val viewModel: LoginViewModel by viewModels {
+        LoginViewModelFactory(userRepository, preferencesManager)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setupAnimations()
         setupListeners()
         setObservers()
 
-        // Cargar preferencias
-        val prefs = getSharedPreferences("loginPrefs", MODE_PRIVATE)
+        viewModel.checkIfLoggedIn()
 
-        // Verificar si ya hay un usuario logueado
-        viewModel.checkIfLoggedIn(prefs)
-
-        // Recuperar credenciales guardadas y marcar el CheckBox si estaban guardadas
-        val storedCredentials = viewModel.getStoredCredentials(prefs)
+        val storedCredentials = viewModel.getStoredCredentials()
         if (storedCredentials != null) {
             binding.editTextEmail.setText(storedCredentials.first)
             binding.editTextPassword.setText(storedCredentials.second)
@@ -55,14 +60,12 @@ class LoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val prefs = getSharedPreferences("loginPrefs", MODE_PRIVATE)
-            viewModel.login(email, password, prefs)
+            viewModel.login(email, password)
 
-            // Guardar credenciales si el usuario marcó "Recordar usuario"
             if (binding.checkBoxRememberMe.isChecked) {
-                viewModel.saveUserAndPass(prefs, email, password)
+                viewModel.saveUserAndPass(email, password)
             } else {
-                viewModel.clearUserAndPass(prefs)  // Borra usuario si desmarcan el check
+                viewModel.clearUserAndPass()
             }
         }
     }
@@ -81,7 +84,6 @@ class LoginActivity : AppCompatActivity() {
                         hideLoading()
                         showToast("Error: ${state.message} (Código: ${state.errorCode})")
                     }
-                    else -> {}
                 }
             }
         }
@@ -121,6 +123,9 @@ class LoginActivity : AppCompatActivity() {
 
     private fun showLoading() {
         binding.progressIndicator.isVisible = true
+        binding.progressIndicator.isIndeterminate = true
+        binding.progressIndicator.animate().alpha(1f).setDuration(300).start()
+
         binding.loginFormContainer.animate().alpha(0.5f).setDuration(300).start()
     }
 

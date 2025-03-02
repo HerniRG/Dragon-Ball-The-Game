@@ -1,16 +1,16 @@
 package com.keepcoding.dragonball.Repository
 
 import com.google.gson.Gson
-import com.keepcoding.dragonball.Heroes.Data.PreferencesMagager
+import com.keepcoding.dragonball.data.ApiConstants
+import com.keepcoding.dragonball.data.PreferencesManager
 import com.keepcoding.dragonball.Model.Characters
 import com.keepcoding.dragonball.Model.CharactersDTO
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
-class CharactersRepository(private val localDataSource: PreferencesMagager) {
+class CharactersRepository(private val preferencesManager: PreferencesManager) {
 
-    private val BASE_URL = "https://dragonball.keepcoding.education/api/"
     private var charactersList = listOf<Characters>()
 
     sealed class CharactersResponse {
@@ -18,25 +18,37 @@ class CharactersRepository(private val localDataSource: PreferencesMagager) {
         data class Error(val message: String) : CharactersResponse()
     }
 
+    private fun getUserId(): String =
+        preferencesManager.getUserAndPass()?.first ?: "default"
+
+    private fun loadFromCache(): Boolean {
+        val cachedJson = preferencesManager.getCharactersList(getUserId())
+        if (cachedJson.isNotEmpty()) {
+            try {
+                val charactersArray = Gson().fromJson(cachedJson, Array<Characters>::class.java)
+                if (charactersArray.isNotEmpty()) {
+                    charactersList = charactersArray.toList()
+                    return true
+                }
+            } catch (_: Exception) { }
+        }
+        return false
+    }
+
+    private fun persistCharacters() {
+        val json = Gson().toJson(charactersList)
+        preferencesManager.saveCharactersList(getUserId(), json)
+    }
+
     fun fetchCharacters(token: String): CharactersResponse {
-        // Si ya están en memoria, devolvemos directamente
         if (charactersList.isNotEmpty()) {
             return CharactersResponse.Success(charactersList)
         }
-
-        // Miramos si existe en local
-        val cachedJson = localDataSource.getCharactersList()
-        if (cachedJson.isNotEmpty()) {
-            val charactersArray = Gson().fromJson(cachedJson, Array<Characters>::class.java)
-            if (!charactersArray.isNullOrEmpty()) {
-                charactersList = charactersArray.toList()
-                return CharactersResponse.Success(charactersList)
-            }
+        if (loadFromCache()) {
+            return CharactersResponse.Success(charactersList)
         }
-
-        // Si no están en local, los descargamos de internet
         val client = OkHttpClient()
-        val url = "${BASE_URL}heros/all"
+        val url = "${ApiConstants.BASE_URL}${ApiConstants.HEROS_ALL_ENDPOINT}"
         val formBody = FormBody.Builder()
             .add("name", "")
             .build()
@@ -52,8 +64,6 @@ class CharactersRepository(private val localDataSource: PreferencesMagager) {
             val responseBody = response.body?.string().orEmpty()
             val charactersDto: Array<CharactersDTO> =
                 Gson().fromJson(responseBody, Array<CharactersDTO>::class.java)
-
-            // Convertimos y guardamos
             charactersList = charactersDto.map {
                 Characters(
                     id = it.id,
@@ -64,8 +74,7 @@ class CharactersRepository(private val localDataSource: PreferencesMagager) {
                     timesSelected = 0
                 )
             }
-            localDataSource.saveCharactersList(Gson().toJson(charactersList))
-
+            persistCharacters()
             CharactersResponse.Success(charactersList)
         } else {
             CharactersResponse.Error("Error al descargar los personajes: ${response.message}")
@@ -76,16 +85,14 @@ class CharactersRepository(private val localDataSource: PreferencesMagager) {
         if (charactersList.isEmpty()) {
             return CharactersResponse.Error("No hay personajes cargados.")
         }
-        val updatedList = charactersList.map { character ->
+        charactersList = charactersList.map { character ->
             if (character.id == characterId) {
                 val newLife = (character.currentLife - damage).coerceAtLeast(0)
                 character.copy(currentLife = newLife)
             } else character
         }
-        charactersList = updatedList
-
-        // Guardar en local
-        localDataSource.saveCharactersList(Gson().toJson(charactersList))
+        val userId = preferencesManager.getUserAndPass()?.first ?: "default"
+        preferencesManager.saveCharactersList(userId, Gson().toJson(charactersList))
         return CharactersResponse.Success(charactersList)
     }
 
@@ -93,14 +100,13 @@ class CharactersRepository(private val localDataSource: PreferencesMagager) {
         if (charactersList.isEmpty()) {
             return CharactersResponse.Error("No hay personajes cargados.")
         }
-        val updatedList = charactersList.map { character ->
+        charactersList = charactersList.map { character ->
             if (character.id == characterId) {
                 character.copy(timesSelected = character.timesSelected + 1)
             } else character
         }
-        charactersList = updatedList
-
-        localDataSource.saveCharactersList(Gson().toJson(charactersList))
+        val userId = preferencesManager.getUserAndPass()?.first ?: "default"
+        preferencesManager.saveCharactersList(userId, Gson().toJson(charactersList))
         return CharactersResponse.Success(charactersList)
     }
 }

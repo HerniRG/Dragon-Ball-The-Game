@@ -6,4 +6,5 @@ data class Characters(
     val imageUrl : String,
     var currentLife : Int,
     val totalLife: Int = 100,
+    var isDead: Boolean = false,
     var timesSelected: Int = 0)

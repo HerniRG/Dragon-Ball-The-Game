@@ -16,6 +16,8 @@
     <color name="buttonTextColor">#FFFFFF</color>
     <color name="buttonColorRed">#D32F2F</color>
     <color name="buttonTextColorRed">#FFFFFF</color>
+    <color name="buttonColorDamage">#E53935</color>
+    <color name="buttonColorHeal">#43A047</color>
 
     <!-- Texto y bordes -->
     <color name="textColor">#212121</color>

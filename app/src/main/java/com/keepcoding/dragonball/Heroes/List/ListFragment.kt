@@ -28,17 +28,17 @@ class ListFragment : Fragment() {
         binding = FragmentListBinding.inflate(inflater, container, false)
         initViews()
         setObservers()
+        setupListeners()
         return binding.root
     }
 
     private fun initViews() {
         adapter = HeroesAdapter(
-            //lambda
             onCharacterClicked = { character ->
                 viewModel.selectedCharacter(character)
             }
         )
-        binding.heroesRecyclerView.layoutManager = LinearLayoutManager(this.context)
+        binding.heroesRecyclerView.layoutManager = LinearLayoutManager(context)
         binding.heroesRecyclerView.adapter = adapter
     }
 
@@ -46,22 +46,26 @@ class ListFragment : Fragment() {
         lifecycleScope.launch {
             viewModel.uiState.collect { state ->
                 when (state) {
-                    is HeroesViewModel.State.Loading -> showLoading()
+                    is HeroesViewModel.State.Loading -> { showLoading() }
                     is HeroesViewModel.State.Success -> {
                         hideLoading()
                         adapter.updateHeroes(state.heroes)
                     }
-                    is HeroesViewModel.State.Error -> {
-                        hideLoading()
-                        Toast.makeText(context, "Error: ${state.message}", Toast.LENGTH_SHORT).show()
-                    }
                     is HeroesViewModel.State.CharacterSelected -> {
-                        // Navigate to detail
                         (activity as? Navigation)?.navToDetail()
                     }
-                    else -> {}
+                    is HeroesViewModel.State.Error -> {
+                        Toast.makeText(context, "Error: ${state.message}", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
+        }
+    }
+
+    private fun setupListeners() {
+        binding.fabHealAll.setOnClickListener {
+            viewModel.healAllHeroes()
+            Toast.makeText(context, "Todos los héroes han sido curados 🎉", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -73,7 +77,5 @@ class ListFragment : Fragment() {
     private fun hideLoading() {
         binding.progressIndicator.visibility = View.GONE
         binding.heroesRecyclerView.visibility = View.VISIBLE
-
     }
-
 }
