@@ -1,6 +1,7 @@
 package com.keepcoding.dragonball.Repository
 
 import com.google.gson.Gson
+import com.keepcoding.dragonball.R
 import com.keepcoding.dragonball.data.ApiConstants
 import com.keepcoding.dragonball.data.PreferencesManager
 import com.keepcoding.dragonball.Model.Characters
@@ -15,7 +16,7 @@ class CharactersRepository(private val preferencesManager: PreferencesManager) {
 
     sealed class CharactersResponse {
         data class Success(val characters: List<Characters>) : CharactersResponse()
-        data class Error(val message: String) : CharactersResponse()
+        data class Error(val errorResId: Int) : CharactersResponse()
     }
 
     private fun getUserId(): String =
@@ -47,11 +48,10 @@ class CharactersRepository(private val preferencesManager: PreferencesManager) {
         if (loadFromCache()) {
             return CharactersResponse.Success(charactersList)
         }
+
         val client = OkHttpClient()
         val url = "${ApiConstants.BASE_URL}${ApiConstants.HEROS_ALL_ENDPOINT}"
-        val formBody = FormBody.Builder()
-            .add("name", "")
-            .build()
+        val formBody = FormBody.Builder().add("name", "").build()
 
         val request = Request.Builder()
             .url(url)
@@ -77,13 +77,13 @@ class CharactersRepository(private val preferencesManager: PreferencesManager) {
             persistCharacters()
             CharactersResponse.Success(charactersList)
         } else {
-            CharactersResponse.Error("Error al descargar los personajes: ${response.message}")
+            CharactersResponse.Error(ErrorMessages.getErrorMessage(response.code))
         }
     }
 
     fun updateCharacterLife(characterId: String, damage: Int): CharactersResponse {
         if (charactersList.isEmpty()) {
-            return CharactersResponse.Error("No hay personajes cargados.")
+            return CharactersResponse.Error(R.string.error_no_characters)
         }
         charactersList = charactersList.map { character ->
             if (character.id == characterId) {
@@ -91,22 +91,20 @@ class CharactersRepository(private val preferencesManager: PreferencesManager) {
                 character.copy(currentLife = newLife)
             } else character
         }
-        val userId = preferencesManager.getUserAndPass()?.first ?: "default"
-        preferencesManager.saveCharactersList(userId, Gson().toJson(charactersList))
+        persistCharacters()
         return CharactersResponse.Success(charactersList)
     }
 
     fun incrementTimesSelected(characterId: String): CharactersResponse {
         if (charactersList.isEmpty()) {
-            return CharactersResponse.Error("No hay personajes cargados.")
+            return CharactersResponse.Error(R.string.error_no_characters)
         }
         charactersList = charactersList.map { character ->
             if (character.id == characterId) {
                 character.copy(timesSelected = character.timesSelected + 1)
             } else character
         }
-        val userId = preferencesManager.getUserAndPass()?.first ?: "default"
-        preferencesManager.saveCharactersList(userId, Gson().toJson(charactersList))
+        persistCharacters()
         return CharactersResponse.Success(charactersList)
     }
 }

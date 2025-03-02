@@ -11,6 +11,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.keepcoding.dragonball.Heroes.HeroesViewModel
 import com.keepcoding.dragonball.Heroes.Navigation
+import com.keepcoding.dragonball.R
+import com.keepcoding.dragonball.Repository.ErrorMessages
 import com.keepcoding.dragonball.databinding.FragmentListBinding
 import kotlinx.coroutines.launch
 
@@ -46,7 +48,7 @@ class ListFragment : Fragment() {
         lifecycleScope.launch {
             viewModel.uiState.collect { state ->
                 when (state) {
-                    is HeroesViewModel.State.Loading -> { showLoading() }
+                    is HeroesViewModel.State.Loading -> showLoading()
                     is HeroesViewModel.State.Success -> {
                         hideLoading()
                         adapter.updateHeroes(state.heroes)
@@ -55,7 +57,7 @@ class ListFragment : Fragment() {
                         (activity as? Navigation)?.navToDetail()
                     }
                     is HeroesViewModel.State.Error -> {
-                        Toast.makeText(context, "Error: ${state.message}", Toast.LENGTH_SHORT).show()
+                        showToast(ErrorMessages.getErrorMessage(state.errorResId))
                     }
                 }
             }
@@ -65,7 +67,7 @@ class ListFragment : Fragment() {
     private fun setupListeners() {
         binding.fabHealAll.setOnClickListener {
             viewModel.healAllHeroes()
-            Toast.makeText(context, "Todos los héroes han sido curados 🎉", Toast.LENGTH_SHORT).show()
+            showToast(R.string.heal_all_heroes)
         }
     }
 
@@ -77,5 +79,9 @@ class ListFragment : Fragment() {
     private fun hideLoading() {
         binding.progressIndicator.visibility = View.GONE
         binding.heroesRecyclerView.visibility = View.VISIBLE
+    }
+
+    private fun showToast(messageResId: Int) {
+        Toast.makeText(context, getString(messageResId), Toast.LENGTH_SHORT).show()
     }
 }

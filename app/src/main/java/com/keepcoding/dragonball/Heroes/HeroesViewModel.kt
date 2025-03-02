@@ -3,9 +3,11 @@ package com.keepcoding.dragonball.Heroes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
+import com.keepcoding.dragonball.R
 import com.keepcoding.dragonball.data.PreferencesManager
 import com.keepcoding.dragonball.Model.Characters
 import com.keepcoding.dragonball.Repository.CharactersRepository
+import com.keepcoding.dragonball.Repository.ErrorMessages
 import com.keepcoding.dragonball.Repository.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,24 +21,19 @@ class HeroesViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<State>(State.Loading)
     val uiState: StateFlow<State> get() = _uiState.asStateFlow()
 
-    // Guardaremos la instancia de PreferencesManager para persistir cambios
     private lateinit var prefs: PreferencesManager
 
     sealed class State {
-        object Loading : State()
+        data object Loading : State()
         data class Success(val heroes: List<Characters>) : State()
-        data class Error(val message: String, val errorCode: Int) : State()
+        data class Error(val errorResId: Int) : State()
         data class CharacterSelected(val characters: Characters, val uniqueId: Long = System.nanoTime()) : State()
     }
 
     private var charactersList = listOf<Characters>()
 
-    // Extraemos de forma segura el identificador del usuario (o usamos "default")
-    private fun getUserId(): String {
-        return prefs.getUserAndPass()?.first ?: "default"
-    }
+    private fun getUserId(): String = prefs.getUserAndPass()?.first ?: "default"
 
-    // Función que centraliza la persistencia de la lista de personajes
     private fun persistCharacters() {
         val json = Gson().toJson(charactersList)
         prefs.saveCharactersList(userId = getUserId(), charactersJson = json)
@@ -45,7 +42,6 @@ class HeroesViewModel : ViewModel() {
     fun downloadCharacters(preferencesManager: PreferencesManager) {
         prefs = preferencesManager
 
-        // Intentamos cargar la lista persistida para el usuario actual
         val savedJson = prefs.getCharactersList(getUserId())
         if (savedJson.isNotEmpty()) {
             try {
@@ -55,12 +51,9 @@ class HeroesViewModel : ViewModel() {
                     _uiState.value = State.Success(charactersList)
                     return
                 }
-            } catch (e: Exception) {
-                // Si falla la conversión, se ignora y se continúa
-            }
+            } catch (_: Exception) { }
         }
 
-        // Si no hay datos persistidos, se descargan desde el servidor
         if (charactersList.isNotEmpty()) return
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -72,7 +65,7 @@ class HeroesViewModel : ViewModel() {
             userRepository.loadTokenIfNeeded()
             val token = userRepository.getToken()
             if (token.isBlank()) {
-                _uiState.value = State.Error("El token está vacío", 401)
+                _uiState.value = State.Error(R.string.error_unauthorized)
                 return@launch
             }
 
@@ -83,7 +76,7 @@ class HeroesViewModel : ViewModel() {
                     _uiState.value = State.Success(charactersList)
                 }
                 is CharactersRepository.CharactersResponse.Error -> {
-                    _uiState.value = State.Error(response.message, 500)
+                    _uiState.value = State.Error(ErrorMessages.getErrorMessage(500))
                 }
             }
         }
@@ -103,7 +96,7 @@ class HeroesViewModel : ViewModel() {
 
     fun healHero(hero: Characters) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (hero.isDead) return@launch  // No se cura individualmente un héroe muerto
+            if (hero.isDead) return@launch
             val healAmount = 20
             charactersList = charactersList.map {
                 if (it.id == hero.id) {
@@ -123,7 +116,7 @@ class HeroesViewModel : ViewModel() {
 
     fun damageHero(hero: Characters) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (hero.isDead) return@launch  // No se daña un héroe ya muerto
+            if (hero.isDead) return@launch
             val randomDamage = (10..60).random()
             charactersList = charactersList.map {
                 if (it.id == hero.id) {

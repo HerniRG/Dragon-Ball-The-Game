@@ -41,7 +41,7 @@
         app:tint="@android:color/white"
         app:maxImageSize="40dp"
         app:backgroundTint="@color/buttonColorRed"
-        android:contentDescription="@string/cura_a_todos_los_heroes"
+        android:contentDescription="@string/heal_all_heroes"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         />

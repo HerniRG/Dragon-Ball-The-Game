@@ -30,7 +30,7 @@
                 android:id="@+id/headerImage"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:contentDescription="@string/header_imagen"
+                android:contentDescription="@string/header_image"
                 android:fitsSystemWindows="true"
                 android:scaleType="centerCrop"
                 android:src="@mipmap/header"

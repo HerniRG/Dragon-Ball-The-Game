@@ -1,11 +1,27 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2025. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-  ~ Morbi non lorem porttitor neque feugiat blandit. Ut vitae ipsum eget quam lacinia accumsan.
-  ~ Etiam sed turpis ac ipsum condimentum fringilla. Maecenas magna.
-  ~ Proin dapibus sapien vel ante. Aliquam erat volutpat. Pellentesque sagittis ligula eget metus.
-  ~ Vestibulum commodo. Ut rhoncus gravida arcu.
-  -->
+<?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <string name="app_name">dragonball</string>
+    <string name="app_name">Dragon Ball El Juego</string>
+    <string name="header_image">imagen del header</string>
+    <string name="dragon_ball_image">imagen de dragon ball</string>
+    <string name="email">Correo electrónico</string>
+    <string name="password">Contraseña</string>
+    <string name="remember_email_and_password">Recordar correo electrónico y contraseña</string>
+    <string name="login">Iniciar sesión</string>
+    <string name="ball_dragon_icon">icono bola de dragón</string>
+    <string name="hero_name">Héroe</string>
+    <string name="hero_image">Imagen del héroe</string>
+    <string name="damage">Daño</string>
+    <string name="heal">Curación</string>
+    <string name="back_to_listing">Volver al listado</string>
+    <string name="heal_all_heroes">Cura a todos los Heroes</string>
+    <string name="dead">Muerto</string>
+    <string name="logout">Cerrar sesión</string>
+    <string name="error_unauthorized">Acceso no autorizado. Por favor, inicia sesión nuevamente.</string>
+    <string name="error_server">Error del servidor. Inténtalo más tarde.</string>
+    <string name="error_unknown">Ocurrió un error inesperado.</string>
+    <string name="error_no_characters">No hay personajes cargados.</string>
+    <string name="login_success">Inicio de sesión exitoso</string>
+    <string name="error_empty_credentials">Por favor, introduce usuario y contraseña</string>
+    <string name="hero_dead">%1$s ha muerto</string>
 </resources>

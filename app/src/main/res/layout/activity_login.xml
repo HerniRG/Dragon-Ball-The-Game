@@ -13,7 +13,7 @@
         android:id="@+id/imageHeader"
         android:layout_width="match_parent"
         android:layout_height="250dp"
-        android:contentDescription="@string/header_imagen"
+        android:contentDescription="@string/header_image"
         android:scaleType="centerCrop"
         android:src="@mipmap/header"
         app:layout_constraintEnd_toEndOf="parent"
@@ -39,7 +39,7 @@
             android:id="@+id/imageAppName"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:contentDescription="@string/app_image"
+            android:contentDescription="@string/dragon_ball_image"
             android:scaleType="fitCenter"
             android:src="@mipmap/dragon_ball"
             android:layout_marginBottom="16dp"/>
@@ -76,7 +76,7 @@
             android:id="@+id/checkBoxRememberMe"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/recordar_usuario_y_contrase_a"
+            android:text="@string/remember_email_and_password"
             android:layout_marginBottom="16dp"
             android:checked="false"/>
 

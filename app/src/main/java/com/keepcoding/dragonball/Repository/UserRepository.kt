@@ -1,6 +1,7 @@
 package com.keepcoding.dragonball.Repository
 
 import android.util.Base64
+import com.keepcoding.dragonball.R
 import com.keepcoding.dragonball.data.ApiConstants
 import com.keepcoding.dragonball.data.PreferencesManager
 import okhttp3.FormBody
@@ -15,7 +16,7 @@ class UserRepository(private val preferencesManager: PreferencesManager) {
 
     sealed class LoginResponse {
         object Success : LoginResponse()
-        data class Error(val message: String) : LoginResponse()
+        data class Error(val errorResId: Int) : LoginResponse()
     }
 
     fun login(user: String, password: String): LoginResponse {
@@ -39,10 +40,10 @@ class UserRepository(private val preferencesManager: PreferencesManager) {
                 preferencesManager.saveToken(token)
                 LoginResponse.Success
             } else {
-                LoginResponse.Error("Error al hacer login. Código HTTP: ${response.code}")
+                LoginResponse.Error(ErrorMessages.getErrorMessage(response.code))
             }
         } catch (e: Exception) {
-            LoginResponse.Error("Error al hacer login: ${e.message}")
+            LoginResponse.Error(R.string.error_unknown)
         }
     }
 

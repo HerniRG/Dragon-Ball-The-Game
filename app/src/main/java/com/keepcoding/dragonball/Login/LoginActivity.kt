@@ -11,6 +11,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import com.keepcoding.dragonball.R
 import com.keepcoding.dragonball.data.PreferencesManager
 import com.keepcoding.dragonball.databinding.ActivityLoginBinding
 import com.keepcoding.dragonball.Heroes.HeroesActivity
@@ -44,9 +45,9 @@ class LoginActivity : AppCompatActivity() {
         viewModel.checkIfLoggedIn()
 
         val storedCredentials = viewModel.getStoredCredentials()
-        if (storedCredentials != null) {
-            binding.editTextEmail.setText(storedCredentials.first)
-            binding.editTextPassword.setText(storedCredentials.second)
+        storedCredentials?.let { (email, password) ->
+            binding.editTextEmail.setText(email)
+            binding.editTextPassword.setText(password)
             binding.checkBoxRememberMe.isChecked = true
         }
     }
@@ -56,7 +57,7 @@ class LoginActivity : AppCompatActivity() {
             val email = binding.editTextEmail.text.toString()
             val password = binding.editTextPassword.text.toString()
             if (email.isBlank() || password.isBlank()) {
-                showToast("Por favor, introduce usuario y contraseña")
+                showToast(R.string.error_empty_credentials)
                 return@setOnClickListener
             }
 
@@ -82,15 +83,14 @@ class LoginActivity : AppCompatActivity() {
                     }
                     is LoginViewModel.State.Error -> {
                         hideLoading()
-                        showToast("Error: ${state.message} (Código: ${state.errorCode})")
-                    }
+                        showToast(state.errorResId)                    }
                 }
             }
         }
     }
 
     private fun setupAnimations() {
-        binding.imageHeader?.apply {
+        binding.imageHeader.apply {
             alpha = 0f
             animate()
                 .alpha(1f)
@@ -114,11 +114,11 @@ class LoginActivity : AppCompatActivity() {
 
     private fun navigateToHeroes() {
         startActivity(Intent(this, HeroesActivity::class.java))
-        showToast("Login exitoso")
+        showToast(R.string.login_success)
     }
 
-    private fun showToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    private fun showToast(messageResId: Int) {
+        Toast.makeText(this, getString(messageResId), Toast.LENGTH_SHORT).show()
     }
 
     private fun showLoading() {

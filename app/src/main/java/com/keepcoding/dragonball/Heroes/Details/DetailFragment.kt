@@ -15,6 +15,7 @@ import com.bumptech.glide.request.transition.DrawableCrossFadeFactory
 import com.keepcoding.dragonball.Heroes.HeroesViewModel
 import com.keepcoding.dragonball.Heroes.Navigation
 import com.keepcoding.dragonball.Model.Characters
+import com.keepcoding.dragonball.R
 import com.keepcoding.dragonball.databinding.FragmentDetailBinding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -83,7 +84,7 @@ class DetailFragment : Fragment() {
     private fun updateButtonsState(isDead: Boolean) {
         with(binding) {
             if (isDead) {
-                Toast.makeText(context, "${nameHero.text} ha muerto", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.hero_dead, nameHero.text), Toast.LENGTH_SHORT).show()
                 disableButtons()
                 lifecycleScope.launch {
                     delay(1000)

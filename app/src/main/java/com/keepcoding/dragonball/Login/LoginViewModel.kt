@@ -2,6 +2,7 @@ package com.keepcoding.dragonball.Login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.keepcoding.dragonball.Repository.ErrorMessages
 import com.keepcoding.dragonball.data.PreferencesManager
 import com.keepcoding.dragonball.Repository.UserRepository
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +23,7 @@ class LoginViewModel(
         data object Idle : State()
         data object Loading : State()
         data object Success : State()
-        data class Error(val message: String, val errorCode: Int) : State()
+        data class Error(val errorResId: Int) : State()
     }
 
     fun login(user: String, password: String) {
@@ -34,7 +35,7 @@ class LoginViewModel(
                     _uiState.value = State.Success
                 }
                 is UserRepository.LoginResponse.Error -> {
-                    _uiState.value = State.Error("Error de login: ${loginResponse.message}", 401)
+                    _uiState.value = State.Error(ErrorMessages.getErrorMessage(401))
                 }
             }
         }
